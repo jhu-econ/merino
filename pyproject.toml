@@ -5,18 +5,22 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "black>=25.1.0",
     "jupyter>=1.1.1",
-    "jupytext>=1.17.3",
-    "linearmodels>=6.1",
-    "matplotlib>=3.10.6",
-    "numpy>=2.3.2",
-    "pandas>=2.3.2",
+    "linearmodels>=7.0",
+    "matplotlib>=3.10.9",
+    "numpy>=2.4.4",
+    "pandas>=3.0.3",
     "pandas-datareader>=0.10.0",
-    "patsy>=1.0.1",
-    "ruff>=0.12.11",
-    "scipy>=1.16.1",
+    "patsy>=1.0.2",
+    "scipy>=1.17.1",
     "seaborn>=0.13.2",
-    "statsmodels>=0.14.5",
-    "wooldridge>=0.4.5",
+    "statsmodels>=0.14.6",
+    "wooldridge>=0.5.0",
+]
+
+[dependency-groups]
+dev = [
+    "black>=26.3.1",
+    "mystmd>=1.9.0",
+    "ruff>=0.15.12",
 ]
