@@ -1,16 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks//ipynb,markdown//md,scripts//py
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.18.1
-  kernelspec:
-    display_name: merino
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.2
+kernelspec:
+  display_name: merino
+  language: python
+  name: python3
 ---
 
 # Chapter 6: Multiple Regression Analysis - Further Issues
@@ -41,7 +39,7 @@ Advanced applications of multiple regression require careful attention to model 
 
 The development proceeds hierarchically from data scaling considerations to sophisticated modeling techniques. We examine how changes in measurement units affect coefficient interpretation (Section 6.1), introduce logarithmic transformations for modeling percentage effects and elasticities (Section 6.2), develop methods for incorporating quadratic and interaction terms (Section 6.3), address challenges in standardized coefficients and goodness-of-fit measures (Section 6.4), and conclude with prediction theory and interval construction (Section 6.5-6.6). Throughout, we implement these methods using Python's statsmodels library and illustrate applications with real datasets from econometric research.
 
-```python
+```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -69,7 +67,7 @@ where:
 
 We might want to express birth weight in pounds instead of ounces or cigarettes in packs per day instead of individual cigarettes. Let's see how this can be done and how it affects the coefficients.
 
-```python
+```{code-cell} ipython3
 bwght = wool.data("bwght")
 
 # regress and report coefficients:
@@ -135,7 +133,7 @@ $$\text{price\_sc} = \beta_0 + \beta_1 \cdot \text{nox\_sc} + \beta_2 \cdot \tex
 
 where the `_sc` suffix denotes the standardized version of each variable.
 
-```python
+```{code-cell} ipython3
 # define a function for the standardization:
 def scale(x):
     x_mean = np.mean(x)
@@ -200,7 +198,7 @@ Let's consider a log-log model for housing prices:
 
 $$\log(\text{price}) = \beta_0 + \beta_1 \log(\text{nox}) + \beta_2 \text{rooms} + u$$
 
-```python
+```{code-cell} ipython3
 hprice2 = wool.data("hprice2")
 
 reg = smf.ols(formula="np.log(price) ~ np.log(nox) + rooms", data=hprice2)
@@ -250,7 +248,7 @@ Let's extend our housing price model to include a quadratic term for `rooms` and
 
 $$\log(\text{price}) = \beta_0 + \beta_1 \log(\text{nox}) + \beta_2 \log(\text{dist}) + \beta_3 \text{rooms} + \beta_4 \text{rooms}^2 + \beta_5 \text{stratio} + u$$
 
-```python
+```{code-cell} ipython3
 # Load housing price data for quadratic specification
 hprice2 = wool.data("hprice2")
 
@@ -334,7 +332,7 @@ When we include nonlinear terms like quadratics or interactions, we often want t
 
 Let's test the joint hypothesis that both the coefficient on `rooms` and the coefficient on `rooms**2` are simultaneously zero in Example 6.2.
 
-```python
+```{code-cell} ipython3
 hprice2 = wool.data("hprice2")
 n = hprice2.shape[0]
 
@@ -391,7 +389,7 @@ Consider a model where we want to see how attendance rate (`atndrte`) and prior 
 
 $$\text{stndfnl} = \beta_0 + \beta_1 \text{atndrte} + \beta_2 \text{priGPA} + \beta_3 \text{ACT} + \beta_4 \text{priGPA}^2 + \beta_5 \text{ACT}^2 + \beta_6 \text{atndrte} \cdot \text{priGPA} + u$$
 
-```python
+```{code-cell} ipython3
 # Load student attendance data
 attend = wool.data("attend")
 n = attend.shape[0]
@@ -465,7 +463,7 @@ pd.DataFrame(
 
 Let's calculate the estimated partial effect of attendance rate on `stndfnl` for a student with a prior GPA of 2.59 (the sample average of `priGPA`):
 
-```python
+```{code-cell} ipython3
 # Calculate partial effect of attendance at specific GPA values
 # dstndfnl/datndrte = beta_1 + beta_6*priGPA
 
@@ -515,7 +513,7 @@ $$ H_0: \beta_{\text{atndrte}} + 2.59 \cdot \beta_{\text{atndrte} \cdot \text{pr
 
 We can use the `f_test` method in `statsmodels` to perform this test:
 
-```python
+```{code-cell} ipython3
 # F test for partial effect at priGPA=2.59:
 # We need to create the linear combination manually
 # Partial effect = beta_atndrte + 2.59 * beta_interaction
@@ -554,7 +552,7 @@ The confidence interval for the mean prediction is always narrower than the pred
 
 Let's use the college GPA example to illustrate prediction and interval estimation.
 
-```python
+```{code-cell} ipython3
 gpa2 = wool.data("gpa2")
 
 reg = smf.ols(formula="colgpa ~ sat + hsperc + hsize + I(hsize**2)", data=gpa2)
@@ -574,7 +572,7 @@ table
 
 Suppose we want to predict the college GPA (`colgpa`) for a new student with the following characteristics: SAT score (`sat`) = 1200, high school percentile (`hsperc`) = 30, and high school size (`hsize`) = 5 (in hundreds). First, we create a Pandas DataFrame with these values:
 
-```python
+```{code-cell} ipython3
 # generate data set containing the regressor values for predictions:
 cvalues1 = pd.DataFrame(
     {"sat": [1200], "hsperc": [30], "hsize": [5]},
@@ -586,7 +584,7 @@ cvalues1
 
 To get the point prediction, we use the `predict()` method of the regression results object:
 
-```python
+```{code-cell} ipython3
 # point estimate of prediction (cvalues1):
 colgpa_pred1 = results.predict(cvalues1)
 # Predicted colGPA for Caitlin
@@ -597,7 +595,7 @@ The point prediction for college GPA for this student is approximately 2.70.
 
 We can predict for multiple new individuals at once by providing a DataFrame with multiple rows:
 
-```python
+```{code-cell} ipython3
 # define three sets of regressor variables:
 cvalues2 = pd.DataFrame(
     {"sat": [1200, 900, 1400], "hsperc": [30, 20, 5], "hsize": [5, 3, 1]},
@@ -607,7 +605,7 @@ cvalues2 = pd.DataFrame(
 cvalues2
 ```
 
-```python
+```{code-cell} ipython3
 # point estimate of prediction (cvalues2):
 colgpa_pred2 = results.predict(cvalues2)
 # Predicted colGPA for Jeff
@@ -618,7 +616,7 @@ colgpa_pred2
 
 To obtain confidence and prediction intervals, we use the `get_prediction()` method followed by `summary_frame()`.
 
-```python
+```{code-cell} ipython3
 gpa2 = wool.data("gpa2")
 
 reg = smf.ols(formula="colgpa ~ sat + hsperc + hsize + I(hsize**2)", data=gpa2)
@@ -647,7 +645,7 @@ For "newPerson1" (sat=1200, hsperc=30, hsize=5):
 
 Let's also calculate 99% confidence and prediction intervals (by setting `alpha=0.01`):
 
-```python
+```{code-cell} ipython3
 # point estimates and 99% confidence and prediction intervals:
 colgpa_PICI_99 = results.get_prediction(cvalues2).summary_frame(
     alpha=0.01,
@@ -664,7 +662,7 @@ When dealing with nonlinear models, especially those with quadratic terms or int
 
 Let's create an effect plot for the relationship between `rooms` and `lprice` from Example 6.2, holding other variables at their sample means.
 
-```python
+```{code-cell} ipython3
 hprice2 = wool.data("hprice2")
 
 # repeating the regression from Example 6.2:
@@ -692,7 +690,7 @@ X
 
 We create a DataFrame `X` where `rooms` varies from 4 to 8 (a reasonable range for house rooms), and `nox`, `dist`, and `stratio` are held at their sample means.  Then, we calculate the predicted values and confidence intervals for these values of `rooms`.
 
-```python
+```{code-cell} ipython3
 # calculate 95% confidence interval:
 lpr_PICI = results.get_prediction(X).summary_frame(alpha=0.05)
 lpr_CI = lpr_PICI[
@@ -704,7 +702,7 @@ lpr_CI
 
 Finally, we plot the predicted log price and its confidence interval against the number of rooms.
 
-```python
+```{code-cell} ipython3
 # plot:
 plt.plot(
     X["rooms"],
@@ -775,7 +773,7 @@ where:
 
 **Example: Comparing Models with Adjusted R-squared**
 
-```python
+```{code-cell} ipython3
 # Compare models with different numbers of variables
 import wooldridge as woo
 
@@ -834,7 +832,7 @@ $$BIC = n \ln(SSR/n) + \ln(n)(k+1)$$
 
 **Example: Model Selection with AIC and BIC**
 
-```python
+```{code-cell} ipython3
 # Calculate AIC and BIC for models
 model_selection = pd.DataFrame({
     'Model': ['Model 1', 'Model 2', 'Model 3'],
@@ -883,7 +881,7 @@ display(model_selection.round(2))
 
 **Example: Overfitting Demonstration**
 
-```python
+```{code-cell} ipython3
 # Demonstrate overfitting with too many variables
 np.random.seed(42)
 n = 50  # Small sample
@@ -954,7 +952,7 @@ Variables like income, sales, or participation rates can be zero. Taking $\log(0
 
 Some researchers use $\log(1 + y)$ to handle zeros:
 
-```python
+```{code-cell} ipython3
 # Example with zeros
 income = np.array([0, 1000, 5000, 10000, 50000])
 log_income_plus1 = np.log(1 + income)
@@ -1000,7 +998,7 @@ where $\hat{\sigma}^2 = SSR/(n-k-1)$.
 
 **Example: Correct Prediction from Log Model**
 
-```python
+```{code-cell} ipython3
 # Estimate wage equation
 wage1 = woo.data('wage1')
 log_wage_model = smf.ols('np.log(wage) ~ educ + exper + tenure', data=wage1).fit()
@@ -1075,7 +1073,7 @@ Alternative check for homoskedasticity:
 
 **Example: Comprehensive Residual Analysis**
 
-```python
+```{code-cell} ipython3
 # Estimate model
 hprice1 = woo.data('hprice1')
 house_model = smf.ols('price ~ lotsize + sqrft + bdrms', data=hprice1).fit()
@@ -1143,7 +1141,7 @@ Some observations have disproportionate influence on regression results. Key dia
 
 **Example: Influence Diagnostics**
 
-```python
+```{code-cell} ipython3
 # Calculate influence measures
 from statsmodels.stats.outliers_influence import OLSInfluence
 

@@ -1,16 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks//ipynb,markdown//md,scripts//py
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.18.1
-  kernelspec:
-    display_name: Python 3 (ipykernel)
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.2
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
 ---
 
 # 2. The Simple Regression Model
@@ -43,7 +41,7 @@ The presentation follows a hierarchical development from basic concepts to advan
 
 Throughout this chapter, we implement concepts using Python's scientific computing stack, building intuition through numerical examples and visualization.
 
-```python
+```{code-cell} ipython3
 # Import required libraries
 import matplotlib.pyplot as plt
 import numpy as np
@@ -103,7 +101,7 @@ $$ \text{salary} = \beta_0 + \beta_1 \text{roe} + u $$
 
 Here, `salary` is the dependent variable (CEO's annual salary in thousands of dollars), and `roe` is the independent variable (return on equity, in percentage). We hypothesize that $\beta_1 > 0$, meaning that a higher ROE is associated with a higher CEO salary. Let's calculate the OLS coefficients manually first to understand the underlying computations.
 
-```python
+```{code-cell} ipython3
 # Load and prepare data
 ceosal1 = wool.data("ceosal1")  # Load the ceosal1 dataset from wooldridge package
 roe_values = ceosal1[
@@ -160,7 +158,7 @@ The code first loads the `ceosal1` dataset and extracts the 'roe' and 'salary' c
 
 Now, let's use the `statsmodels` library, which provides a more convenient and comprehensive way to perform OLS regression. This will also serve as a verification of our manual calculations.
 
-```python
+```{code-cell} ipython3
 # Fit regression model using statsmodels for comparison and validation
 regression_model = smf.ols(
     formula="salary ~ roe",  # y ~ x notation: salary depends on roe
@@ -196,7 +194,7 @@ This code snippet uses `statsmodels.formula.api` to define and fit the same regr
 
 To better visualize the regression results and the relationship between CEO salary and ROE, let's create an enhanced regression plot. We'll define a reusable function for this purpose, which includes the regression line, scatter plot of the data, confidence intervals, and annotations for the regression equation and R-squared.
 
-```python
+```{code-cell} ipython3
 def plot_regression(
     x: str,
     y: str,
@@ -270,7 +268,7 @@ def plot_regression(
 
 This function, `plot_regression`, takes the variable names, data, regression results, and plot title as input. It generates a scatter plot of the data points, plots the regression line, and optionally adds 95% confidence intervals around the regression line. It also annotates the plot with the regression equation and the R-squared value. This function makes it easy to visualize and interpret simple regression results.
 
-```python
+```{code-cell} ipython3
 # Create enhanced regression plot for CEO Salary vs ROE
 plot_regression(
     "roe",
@@ -301,7 +299,7 @@ $$\text{wage} = \beta_0 + \beta_1 \text{educ} + u$$
 
 Here, `wage` is the hourly wage (in dollars), and `educ` is years of education. We expect a positive relationship, i.e., $\beta_1 > 0$, as more education is generally believed to lead to higher wages.
 
-```python
+```{code-cell} ipython3
 # Load and analyze wage data
 wage1 = wool.data("wage1")  # Load the wage1 dataset
 
@@ -336,7 +334,7 @@ This code loads the `wage1` dataset, fits the regression model of `wage` on `edu
 We find $\hat{\beta}_1 = 0.54$. This implies that, on average, each additional year of education is associated with an increase in hourly wage of approximately \$0.54. The intercept, $\hat{\beta}_0 = -0.90$, represents the predicted wage for someone with zero years of education. The R-squared is 0.165, meaning that about 16.5% of the variation in hourly wages is explained by years of education in this simple model. Education appears to be a somewhat more important factor in explaining wages than ROE was for CEO salaries, but still, a large portion of wage variation remains unexplained by education alone.
 :::
 
-```python
+```{code-cell} ipython3
 # Create visualization
 plot_regression(
     "educ",
@@ -357,7 +355,7 @@ $$ \text{voteA} = \beta_0 + \beta_1 \text{shareA} + u $$
 
 Here, `voteA` is the percentage of votes received by candidate A, and `shareA` is the percentage of campaign spending by candidate A out of the total spending by both candidates. We expect that higher campaign spending share for candidate A will lead to a higher vote share, so we anticipate $\beta_1 > 0$.
 
-```python
+```{code-cell} ipython3
 # Load and analyze voting data
 vote1 = wool.data("vote1")  # Load the vote1 dataset
 
@@ -392,7 +390,7 @@ This code loads the `vote1` dataset, fits the regression model using `statsmodel
 We find $\hat{\beta}_1 = 0.46$. This suggests that for every one percentage point increase in candidate A's share of campaign spending, candidate A's vote share is predicted to increase by approximately 0.46 percentage points. The intercept, $\hat{\beta}_0 = 26.81$, represents the predicted vote share for candidate A if their campaign spending share is zero. The R-squared is 0.856, which is quite high! It indicates that about 85.6% of the variation in candidate A's vote share is explained by their share of campaign spending in this simple model. This suggests that campaign spending share is a very strong predictor of voting outcomes, at least in this dataset.
 :::
 
-```python
+```{code-cell} ipython3
 # Create visualization
 plot_regression(
     "shareA",
@@ -430,7 +428,7 @@ Residuals are estimates of the unobservable error terms $u_i$. In OLS regression
 
 Let's go back to the CEO salary and ROE example and examine the fitted values and residuals. We will calculate these and present the first 15 observations in a table. We will also create a residual plot to visualize the residuals.
 
-```python
+```{code-cell} ipython3
 # Prepare regression results - Re-run the regression for ceosal1 dataset
 ceosal1 = wool.data("ceosal1")  # Load data again (if needed)
 reg = smf.ols(formula="salary ~ roe", data=ceosal1)  # Define the regression model
@@ -466,7 +464,7 @@ This code calculates the fitted values and residuals, then creates and displays 
 By examining the table, you can see for each company the actual CEO salary, the salary predicted by the regression model based on ROE, and the residual, which is the difference between the actual and predicted salary. A positive residual means the actual salary is higher than predicted, and a negative residual means it's lower.
 :::
 
-```python
+```{code-cell} ipython3
 # Create residual plot with seaborn defaults
 fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -497,7 +495,7 @@ Let's verify some important properties of OLS residuals using the wage and educa
 
 Let's check these properties using the `wage1` dataset.
 
-```python
+```{code-cell} ipython3
 # Load and prepare data - Re-run the regression for wage1 dataset
 wage1 = wool.data("wage1")  # Load wage1 data
 reg = smf.ols(formula="wage ~ educ", data=wage1)  # Define regression model
@@ -598,7 +596,7 @@ A higher R-squared generally indicates a better fit, but it's important to remem
 
 Let's calculate and compare R-squared for the CEO salary and ROE example using different formulas. We will also create visualizations to understand the concept of goodness of fit.
 
-```python
+```{code-cell} ipython3
 # Load and prepare data - Re-run regression for ceosal1
 ceosal1 = wool.data("ceosal1")  # Load data
 reg = smf.ols(formula="salary ~ roe", data=ceosal1)  # Define regression model
@@ -642,7 +640,7 @@ This code calculates R-squared using three different formulas to demonstrate the
 The R-squared value calculated (around 0.013 in our example) will be the same regardless of which formula is used, confirming their equivalence. This low R-squared indicates that ROE explains very little of the variation in CEO salaries.
 :::
 
-```python
+```{code-cell} ipython3
 # Create model fit visualization with seaborn defaults
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
@@ -674,7 +672,7 @@ These two plots provide visual assessments of model fit:
 
 Let's examine the complete regression summary for the voting outcomes and campaign expenditures example, including R-squared and other statistical measures. We will also create an enhanced visualization with a 95% confidence interval.
 
-```python
+```{code-cell} ipython3
 # Load and analyze voting data - Re-run regression for vote1 dataset
 vote1 = wool.data("vote1")  # Load data
 
@@ -770,7 +768,7 @@ $$\log(\text{wage}) = \beta_0 + \beta_1 \text{educ} + u$$
 
 In this model, we are interested in the percentage increase in wage for each additional year of education.
 
-```python
+```{code-cell} ipython3
 # Load and prepare data - Re-use wage1 dataset
 wage1 = wool.data("wage1")  # Load data (if needed)
 
@@ -808,7 +806,7 @@ This code estimates the log-level model using `statsmodels` with `np.log(wage)` 
 We find $\hat{\beta}_1 = 0.0827$. In the log-level model, this coefficient can be interpreted as the approximate percentage change in wage for a one-unit increase in education. So, approximately, each additional year of education is associated with an 8.27% increase in hourly wage. The intercept $\hat{\beta}_0 = 0.5838$ represents the predicted log(wage) when education is zero. The R-squared value is 0.1858, indicating the proportion of variation in $\log(\text{wage})$ explained by education.
 :::
 
-```python
+```{code-cell} ipython3
 # Create log-level visualization with seaborn defaults
 fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -838,7 +836,7 @@ $$\log(\text{salary}) = \beta_0 + \beta_1 \log(\text{sales}) + u$$
 
 In this model, $\beta_1$ represents the elasticity of CEO salary with respect to firm sales.
 
-```python
+```{code-cell} ipython3
 # Load and prepare data - Re-use ceosal1 dataset
 ceosal1 = wool.data("ceosal1")  # Load data (if needed)
 
@@ -876,7 +874,7 @@ This code estimates the log-log model using `statsmodels` with both variables in
 We find $\hat{\beta}_1 = 0.2567$. In the log-log model, this coefficient is the elasticity of salary with respect to sales. It means that a 1% increase in firm sales is associated with approximately a 0.2567% increase in CEO salary. The intercept $\hat{\beta}_0 = 4.8220$ does not have a direct practical interpretation in terms of original variables in this model, but it is needed for the regression equation. The R-squared value is 0.2108, indicating the proportion of variation in $\log(\text{salary})$ explained by $\log(\text{sales})$.
 :::
 
-```python
+```{code-cell} ipython3
 # Create log-log visualization with seaborn defaults
 fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -914,7 +912,7 @@ In this case, $\hat{\beta}_0$ is simply the sample mean of $y$, $\bar{y}$. This 
 
 Let's compare these three regression specifications using the CEO salary and ROE example.
 
-```python
+```{code-cell} ipython3
 # Load and prepare data - Re-use ceosal1 dataset
 ceosal1 = wool.data("ceosal1")  # Load data (if needed)
 
@@ -1110,7 +1108,7 @@ $$\text{math10} = \beta_0 + \beta_1 \text{lnchprg} + u$$
 
 where `math10` is the percentage of students passing a math test, and `lnchprg` is the percentage of students eligible for the lunch program. We expect a negative relationship, i.e., $\beta_1 < 0$, as higher lunch program participation (indicating more poverty) might be associated with lower math scores.
 
-```python
+```{code-cell} ipython3
 # Load and analyze data - Use meap93 dataset
 meap93 = wool.data("meap93")  # Load data
 
@@ -1175,7 +1173,7 @@ For example, in our wage-education regression:
 - But education is correlated with ability, family background, motivation, etc.
 - These omitted factors affect both education and wages
 
-```python
+```{code-cell} ipython3
 # Illustrate the omitted variable problem
 np.random.seed(42)
 n = 1000
@@ -1307,7 +1305,7 @@ $$\widehat{\text{ATE}} = \bar{y}_{\text{treated}} - \bar{y}_{\text{control}}$$
 
 **Connection to regression**: When $x$ is binary (0/1), the regression coefficient equals the ATE!
 
-```python
+```{code-cell} ipython3
 # Simulate a randomized controlled trial
 np.random.seed(123)
 n = 500
@@ -1425,7 +1423,7 @@ Monte Carlo simulations are powerful tools for understanding the statistical pro
 
 Let's start by simulating a single sample from a population regression model. We will define a true population model, generate random data based on this model, estimate the model using OLS on this sample, and compare the estimated coefficients with the true population parameters.
 
-```python
+```{code-cell} ipython3
 # Set random seed for reproducibility - Ensure consistent random number generation
 np.random.seed(1234567)  # Set seed for random number generator
 
@@ -1512,7 +1510,7 @@ By running this code, you will see that the estimated coefficients $\hat{\beta}_
 
 To better understand the sampling properties of OLS estimators, we need to repeat the simulation process many times. This will allow us to observe the distribution of the OLS estimates across different samples, which is known as the **sampling distribution**. We can then check if the estimators are unbiased by looking at the mean of these estimates and examine their variability.
 
-```python
+```{code-cell} ipython3
 # Set parameters - Simulation parameters (number of replications increased)
 np.random.seed(1234567)  # Set seed
 n = 1000  # sample size
@@ -1587,7 +1585,7 @@ By running this code, you will observe the sampling distributions of $\hat{\beta
 
 Now, let's investigate what happens when one of the key assumptions is violated. Consider the violation of SLR.4, the zero conditional mean assumption, i.e., $\text{E}(u|x) \neq 0$. This means that the error term is correlated with $x$. In this case, we expect OLS estimators to be biased. Let's simulate a scenario where this assumption is violated and see the results.
 
-```python
+```{code-cell} ipython3
 # Set parameters - Simulation parameters (same as before)
 np.random.seed(1234567)  # Set seed
 n = 1000
@@ -1664,7 +1662,7 @@ By running this simulation, you will observe that the mean of the estimated coef
 
 Finally, let's consider the violation of SLR.5, the homoscedasticity assumption, i.e., $\text{var}(u|x) \neq \sigma^2$. This means that the variance of the error term is not constant across values of $x$ (heteroscedasticity). While heteroscedasticity does not cause bias in OLS estimators, it affects their efficiency and the validity of standard errors and inference. Let's simulate a scenario with heteroscedasticity.
 
-```python
+```{code-cell} ipython3
 # Set parameters - Simulation parameters (same as before)
 np.random.seed(1234567)  # Set seed
 n = 1000

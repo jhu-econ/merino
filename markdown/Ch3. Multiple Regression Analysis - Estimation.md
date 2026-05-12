@@ -1,16 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks//ipynb,markdown//md,scripts//py
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.18.1
-  kernelspec:
-    display_name: merino
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.2
+kernelspec:
+  display_name: merino
+  language: python
+  name: python3
 ---
 
 # 3. Multiple Regression Analysis: Estimation
@@ -45,7 +43,7 @@ Multiple regression analysis extends simple linear regression to accommodate mul
 
 The presentation proceeds hierarchically through the essential components of multiple regression. We begin with motivation and mathematical specification of the multiple regression model (Section 3.1), derive the OLS estimators through matrix algebra and geometric intuition (Section 3.2), develop the crucial concept of ceteris paribus interpretation holding other factors constant (Section 3.3), examine the Gauss-Markov assumptions required for unbiasedness and establish OLS as BLUE under these conditions (Section 3.4-3.5), and address practical issues including multicollinearity, variance estimation, and model specification (Section 3.6-3.10). Throughout, we implement methods using Python's scientific computing libraries and demonstrate applications with real econometric datasets from labor economics, education, and wage determination.
 
-```python
+```{code-cell} ipython3
 import numpy as np
 import pandas as pd
 import patsy as pt
@@ -88,7 +86,7 @@ $$\text{colGPA} = \beta_0 + \beta_1 \text{hsGPA} + \beta_2 \text{ACT} + u$$
 
 We expect $\beta_1 > 0$ and $\beta_2 > 0$, suggesting that higher high school GPA and ACT scores are associated with higher college GPA, holding the other factor constant.
 
-```python
+```{code-cell} ipython3
 gpa1 = wool.data("gpa1")
 
 reg = smf.ols(formula="colGPA ~ hsGPA + ACT", data=gpa1)
@@ -124,7 +122,7 @@ This is one of the most fundamental equations in labor economics. The log transf
 1. **Percentage interpretation**: Coefficients represent approximate percentage changes
 2. **Better fit**: Wage distributions are typically right-skewed; logs normalize them
 
-```python
+```{code-cell} ipython3
 # Load wage data
 wage1 = wool.data("wage1")
 
@@ -193,7 +191,7 @@ $$ \log(\text{wage}) = \beta_0 + \beta_1 \text{educ} + \beta_2 \text{exper} + \b
 
 In this model, coefficients on `educ`, `exper`, and `tenure` will represent the approximate percentage change in wage for a one-unit increase in each respective variable, holding the others constant. For example, $\beta_1 \approx \% \Delta \text{wage} / \Delta \text{educ}$.
 
-```python
+```{code-cell} ipython3
 wage1 = wool.data("wage1")
 
 reg = smf.ols(formula="np.log(wage) ~ educ + exper + tenure", data=wage1)
@@ -231,7 +229,7 @@ $$ \text{prate} = \beta_0 + \beta_1 \text{mrate} + \beta_2 \text{age} + u$$
 
 We expect $\beta_1 > 0$ because a higher match rate should encourage participation. The expected sign of $\beta_2$ is less clear. Older workforces might have had more time to enroll in 401(k)s, or they may be closer to retirement and thus more interested in pension plans. Conversely, younger firms might be more proactive in encouraging enrollment.
 
-```python
+```{code-cell} ipython3
 k401k = wool.data("401k")
 
 reg = smf.ols(formula="prate ~ mrate + age", data=k401k)
@@ -270,7 +268,7 @@ $$\text{narr86} = \beta_0 + \beta_1 \text{pcnv} + \beta_2 \text{ptime86} + \beta
 
 We expect $\beta_1 > 0$ because a higher conviction rate might deter future crime. We also expect $\beta_2 > 0$ as spending more time in prison in 1986 means more opportunity to be arrested in 1986 (although this might be complex).  We expect $\beta_3 < 0$ because employment should reduce the likelihood of arrests.
 
-```python
+```{code-cell} ipython3
 crime1 = wool.data("crime1")
 
 # model without avgsen:
@@ -303,7 +301,7 @@ $$\text{narr86} = \beta_0 + \beta_1 \text{pcnv} + \beta_2 \text{avgsen} + \beta_
 
 * `avgsen`: Average sentence served from prior convictions (in months) (independent variable). We expect $\beta_2 < 0$ if longer average sentences deter crime.
 
-```python
+```{code-cell} ipython3
 crime1 = wool.data("crime1")
 
 # model with avgsen:
@@ -338,7 +336,7 @@ This extended model adds average sentence length to examine additional deterrent
 
 $$ \log(\text{wage}) = \beta_0 + \beta_1 \text{educ} + u$$
 
-```python
+```{code-cell} ipython3
 wage1 = wool.data("wage1")
 
 reg = smf.ols(formula="np.log(wage) ~ educ", data=wage1)
@@ -390,7 +388,7 @@ Where:
 
 Let's demonstrate this matrix calculation using the `gpa1` dataset from Example 3.1.
 
-```python
+```{code-cell} ipython3
 gpa1 = wool.data("gpa1")
 
 # determine sample size & no. of regressors:
@@ -439,7 +437,7 @@ X.head()
 
 The code above constructs the $X$ matrix and $y$ vector from the `gpa1` data.  The `patsy` library provides a convenient way to create design matrices directly from formulas, which is often more efficient for complex models.
 
-```python
+```{code-cell} ipython3
 # Calculate OLS estimates using the matrix formula: beta_hat = (X'X)^-^1X'y
 
 # Step 1: Convert to numpy arrays for matrix operations
@@ -488,7 +486,7 @@ The denominator $(n-k-1)$ represents the degrees of freedom in multiple regressi
 
 **Key Insight:** The division by $n-k-1$ (not $n$) corrects for the degrees of freedom lost in estimating $k+1$ parameters, making $\hat{\sigma}^2$ an unbiased estimator of $\sigma^2$ under MLR.1-MLR.5.
 
-```python
+```{code-cell} ipython3
 # residuals, estimated variance of u and SER:
 u_hat = (
     y.values.reshape(-1, 1) - X.values @ beta_estimates
@@ -504,7 +502,7 @@ $$\widehat{\text{var}(\hat{\beta})} = \hat{\sigma}^2 (X'X)^{-1}$$
 
 The standard errors for each coefficient are the square roots of the diagonal elements of this variance-covariance matrix.
 
-```python
+```{code-cell} ipython3
 # estimated variance-covariance matrix of beta_hat and standard errors:
 Vbeta_hat = sigsq_hat * np.linalg.inv(
     X.values.T @ X.values,
@@ -536,7 +534,7 @@ If `hsGPA` is correlated with `ACT` (which is likely - students with higher high
 
 Let's see this empirically. First, we estimate the "full" model (including both `hsGPA` and `ACT`):
 
-```python
+```{code-cell} ipython3
 gpa1 = wool.data("gpa1")
 
 # parameter estimates for full model:
@@ -551,7 +549,7 @@ b  # Display coefficients from full model
 
 Now, let's consider the relationship between the included variable (`ACT`) and the omitted variable (`hsGPA`). We can regress the omitted variable (`hsGPA`) on the included variable (`ACT`):
 
-```python
+```{code-cell} ipython3
 # relation between regressors (hsGPA on ACT):
 reg_delta = smf.ols(formula="hsGPA ~ ACT", data=gpa1)
 results_delta = reg_delta.fit()
@@ -572,7 +570,7 @@ Where:
 
 Let's calculate this approximate bias and see how it relates to the difference between the coefficient of `ACT` in the full model ($\beta_2$) and the coefficient of `ACT` in the simple model ($\gamma_1$).
 
-```python
+```{code-cell} ipython3
 # omitted variables formula for b1_tilde (approximate bias in ACT coefficient when hsGPA is omitted):
 b1_tilde = b["ACT"] + b["hsGPA"] * delta_tilde["ACT"]  # Applying the bias formula
 b1_tilde  # Display approximate biased coefficient of ACT
@@ -580,7 +578,7 @@ b1_tilde  # Display approximate biased coefficient of ACT
 
 Finally, let's estimate the simple regression model (omitting `hsGPA`) and see the actual coefficient of `ACT`:
 
-```python
+```{code-cell} ipython3
 # actual regression with hsGPA omitted (simple regression):
 reg_om = smf.ols(formula="colGPA ~ ACT", data=gpa1)
 results_om = reg_om.fit()
@@ -701,7 +699,7 @@ Where $R_j^2$ is the R-squared from regressing $x_j$ on all *other* independent 
 
 Let's illustrate the calculation of standard errors and VIF using the `gpa1` example again.
 
-```python
+```{code-cell} ipython3
 gpa1 = wool.data("gpa1")
 
 # full estimation results including automatic SE from statsmodels:
@@ -759,7 +757,7 @@ Where:
 
 This formula illustrates how the standard error is directly proportional to $\sqrt{VIF_j}$. Higher VIFs lead to larger standard errors.
 
-```python
+```{code-cell} ipython3
 # Manual calculation of SE of hsGPA coefficient using VIF:
 n = results.nobs  # Sample size
 sdx = np.std(gpa1["hsGPA"], ddof=1) * np.sqrt(
@@ -781,7 +779,7 @@ Compare the manually calculated `SE_hsGPA` with the standard error for `hsGPA` r
 
 For models with more than two independent variables, we can use the `variance_inflation_factor` function from `statsmodels.stats.outliers_influence` to easily calculate VIFs for all regressors.
 
-```python
+```{code-cell} ipython3
 wage1 = wool.data("wage1")
 
 # extract matrices using patsy for wage equation with educ, exper, tenure:
@@ -880,7 +878,7 @@ Not all independent variables play the same role in your analysis:
   - Example: `exper` and `tenure` are controls when studying returns to education
   - Purpose: Reduce omitted variable bias, improve precision
 
-```python
+```{code-cell} ipython3
 # Illustrate the distinction between variable of interest and controls
 np.random.seed(42)
 n = 1000
@@ -990,7 +988,7 @@ $$ \text{income} = \beta_0 + \beta_1 \text{education} + \beta_2 \text{occupation
 - By controlling for occupation, we block part of education's effect
 - The coefficient $\beta_1$ now only captures the **direct** effect of education, not the total effect
 
-```python
+```{code-cell} ipython3
 # Demonstrate post-treatment bias
 np.random.seed(123)
 n = 1000
@@ -1085,7 +1083,7 @@ Sometimes we want to control for unobserved variables (like ability) and use **p
 3. Have severe measurement error
 4. Create perfect multicollinearity
 
-```python
+```{code-cell} ipython3
 # Demonstrate good vs bad control selection
 np.random.seed(456)
 n = 1000

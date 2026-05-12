@@ -1,16 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks//ipynb,markdown//md,scripts//py
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.18.1
-  kernelspec:
-    display_name: merino
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.2
+kernelspec:
+  display_name: merino
+  language: python
+  name: python3
 ---
 
 # Chapter 4: Multiple Regression Analysis - Inference
@@ -41,7 +39,7 @@ Statistical inference extends multiple regression analysis beyond point estimati
 
 The organization proceeds systematically through the essential components of inference. We begin with the sampling distribution of OLS estimators and construction of standard errors (Section 4.1), develop hypothesis testing procedures for single coefficients (Section 4.2), extend to joint hypothesis tests involving multiple restrictions (Section 4.3), and examine confidence intervals alongside practical considerations for specification and reporting (Section 4.4-4.7). Throughout, we emphasize both theoretical foundations and computational implementation in Python.
 
-```python
+```{code-cell} ipython3
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
@@ -149,7 +147,7 @@ $$\text{colGPA} = \beta_0 + \beta_1 \text{hsGPA} + \beta_2 \text{ACT} + \beta_3 
 
 We will perform hypothesis tests on the coefficients $\beta_1$, $\beta_2$, and $\beta_3$ to see which of these variables are statistically significant predictors of college GPA. We will use the standard null hypothesis $H_0: \beta_j = 0$ for each variable.
 
-```python
+```{code-cell} ipython3
 # Calculate critical values for hypothesis testing
 # These are the thresholds for rejecting H0 at different significance levels
 
@@ -181,7 +179,7 @@ crit_val_df
 
 This code calculates the critical values from the $t$ distribution for significance levels of 5% and 1% with 137 degrees of freedom (which we will see is approximately the degrees of freedom in our regression). These are the thresholds against which we'll compare our calculated $t$-statistics.
 
-```python
+```{code-cell} ipython3
 # CV for alpha=5% and 1% using the normal approximation:
 alpha = np.array([0.05, 0.01])
 cv_n = stats.norm.ppf(1 - alpha / 2)  # Two-sided critical values
@@ -196,7 +194,7 @@ pd.DataFrame(
 
 For large degrees of freedom, the $t$ distribution approaches the standard normal distribution. This code shows the critical values from the standard normal distribution for comparison. Notice that for these common significance levels, the critical values are quite similar for the $t$ and normal distributions when the degrees of freedom are reasonably large (like 137).
 
-```python
+```{code-cell} ipython3
 gpa1 = wool.data("gpa1")
 
 # store and display results:
@@ -215,7 +213,7 @@ pd.DataFrame(
 
 This code runs the OLS regression of `colGPA` on `hsGPA`, `ACT`, and `skipped` using the `gpa1` dataset from the `wooldridge` package. The `results.summary()` provides a comprehensive output of the regression results, including estimated coefficients, standard errors, t-statistics, p-values, and other relevant statistics.
 
-```python
+```{code-cell} ipython3
 # Manually verify hypothesis testing calculations
 # This demonstrates how t-statistics and p-values are computed
 
@@ -292,7 +290,7 @@ $$\log(\text{wage}) = \beta_0 + \beta_1 \text{educ} + \beta_2 \text{exper} + \be
 
 We will focus on testing hypotheses about the returns to education ($\beta_1$). We might want to test if the return to education is greater than some specific value, or simply if it is different from zero.
 
-```python
+```{code-cell} ipython3
 # CV for alpha=5% and 1% using the t distribution with 522 d.f.:
 alpha = np.array([0.05, 0.01])
 cv_t = stats.t.ppf(1 - alpha / 2, 522)  # Two-sided critical values
@@ -307,7 +305,7 @@ pd.DataFrame(
 
 Similar to the previous example, we calculate the critical values from the $t$ distribution for significance levels of 5% and 1%, but now with 522 degrees of freedom (approximately the degrees of freedom in this regression).
 
-```python
+```{code-cell} ipython3
 # CV for alpha=5% and 1% using the normal approximation:
 alpha = np.array([0.05, 0.01])
 cv_n = stats.norm.ppf(1 - alpha / 2)  # Two-sided critical values
@@ -322,7 +320,7 @@ pd.DataFrame(
 
 Again, we compare these to the critical values from the standard normal distribution.  With 522 degrees of freedom, the $t$ and normal critical values are almost identical.
 
-```python
+```{code-cell} ipython3
 wage1 = wool.data("wage1")
 
 reg = smf.ols(formula="np.log(wage) ~ educ + exper + tenure", data=wage1)
@@ -370,7 +368,7 @@ $$\log(\text{rd}) = \beta_0 + \beta_1 \log(\text{sales}) + \beta_2 \text{profmar
 
 We will construct 95% and 99% confidence intervals for the coefficients $\beta_1$ and $\beta_2$.
 
-```python
+```{code-cell} ipython3
 rdchem = wool.data("rdchem")
 
 # OLS regression:
@@ -389,7 +387,7 @@ pd.DataFrame(
 
 This code runs the OLS regression of $\log(\text{rd})$ on $\log(\text{sales})$ and `profmarg` using the `rdchem` dataset.
 
-```python
+```{code-cell} ipython3
 # 95% CI:
 CI95 = results.conf_int(0.05)  # alpha = 0.05 for 95% CI
 # Display 95% Confidence Intervals
@@ -398,7 +396,7 @@ CI95
 
 This code uses the `conf_int()` method of the regression results object to calculate the 95% confidence intervals for all coefficients.
 
-```python
+```{code-cell} ipython3
 # 99% CI:
 CI99 = results.conf_int(0.01)  # alpha = 0.01 for 99% CI
 # Display 99% Confidence Intervals
@@ -462,7 +460,7 @@ Under the null hypothesis and the CLM assumptions, the $F$ statistic follows an 
 *   Reject $H_0$ if $F > c$, where $c$ is the critical value from the $F_{q, n-k-1}$ distribution at the chosen significance level.
 *   Reject $H_0$ if $p \text{-value} < \alpha$, where $p \text{-value} = 1 - F_{F_{q, n-k-1}}(F)$ and $\alpha$ is the significance level.
 
-```python
+```{code-cell} ipython3
 mlb1 = wool.data("mlb1")
 n = mlb1.shape[0]
 
@@ -484,7 +482,7 @@ pd.DataFrame(
 
 This code estimates the unrestricted model and extracts the R-squared value.
 
-```python
+```{code-cell} ipython3
 # restricted OLS regression:
 reg_r = smf.ols(formula="np.log(salary) ~ years + gamesyr", data=mlb1)
 fit_r = reg_r.fit()
@@ -500,7 +498,7 @@ pd.DataFrame(
 
 This code estimates the restricted model (by omitting `bavg`, `hrunsyr`, and `rbisyr`) and extracts its R-squared. As expected, the R-squared of the restricted model is lower than that of the unrestricted model because we have removed variables.
 
-```python
+```{code-cell} ipython3
 # F statistic:
 k = 5  # Number of independent variables in unrestricted model
 q = 3  # Number of restrictions
@@ -516,7 +514,7 @@ pd.DataFrame(
 
 This code calculates the $F$ statistic using the formula based on R-squared values.
 
-```python
+```{code-cell} ipython3
 # CV for alpha=1% using the F distribution with 3 and 347 d.f.:
 cv = stats.f.ppf(1 - 0.01, q, n - k - 1)  # Degrees of freedom (q, n-k-1)
 # Critical value from F-distribution
@@ -532,7 +530,7 @@ pd.DataFrame(
 
 This calculates the critical value from the $F$ distribution with 3 and $n-k-1$ degrees of freedom for a 1% significance level.
 
-```python
+```{code-cell} ipython3
 # p value = 1-cdf of the appropriate F distribution:
 fpval = 1 - stats.f.cdf(fstat, q, n - k - 1)
 # Calculated p-value
@@ -552,7 +550,7 @@ The calculated $F$ statistic is around 9.25. The p-value is very small (approxim
 
 **Conclusion:** We conclude that batting average, home runs per year, and runs batted in per year are jointly statistically significant determinants of baseball player salaries, even after controlling for years in the league and games played per year.  In other words, at least one of these batting statistics has a significant impact on salary.
 
-```python
+```{code-cell} ipython3
 mlb1 = wool.data("mlb1")
 
 # OLS regression:
@@ -579,7 +577,7 @@ pd.DataFrame(
 
 This code demonstrates how to perform the same $F$ test using the `f_test()` method in `statsmodels`, which provides a more convenient way to conduct $F$ tests for linear restrictions. The results should be identical to our manual calculation, which they are (within rounding).
 
-```python
+```{code-cell} ipython3
 mlb1 = wool.data("mlb1")
 
 # OLS regression:
@@ -639,7 +637,7 @@ A well-constructed regression table should include:
 
 **Example: Properly Formatted Regression Table**
 
-```python
+```{code-cell} ipython3
 # Create a formatted regression table for the wage equation
 wage1 = wool.data("wage1")
 reg_wage = smf.ols("np.log(wage) ~ educ + exper + tenure", data=wage1).fit()
@@ -715,7 +713,7 @@ Coefficient:  0.092***
 
 Often you'll want to present several model specifications side-by-side to show robustness of results or the effect of adding controls:
 
-```python
+```{code-cell} ipython3
 # Estimate three specifications with progressively more controls
 gpa1 = wool.data("gpa1")
 
@@ -827,7 +825,7 @@ This means the error term must be **uncorrelated with all included variables**.
 Consider the wage equation:
 $$\log(\text{wage}) = \beta_0 + \beta_1 \text{educ} + \beta_2 \text{exper} + \beta_3 \text{tenure} + u$$
 
-```python
+```{code-cell} ipython3
 # Estimate wage equation
 wage1 = wool.data("wage1")
 wage_reg = smf.ols("np.log(wage) ~ educ + exper + tenure", data=wage1).fit()
@@ -903,7 +901,7 @@ To credibly claim a causal interpretation, you need one of the following:
 
 ### 4.6.4 Policy Analysis Example: Minimum Wage and Employment
 
-```python
+```{code-cell} ipython3
 # Simulate a policy analysis scenario
 np.random.seed(1234)
 n_states = 50

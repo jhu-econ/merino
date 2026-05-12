@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/alan/Documents/GitHub/alanlujan91/merino/scripts/Ch5. MRA - OLS Asymptotics.py", line 210, in <module>
-    display(comparison_df)
-    ^^^^^^^
-NameError: name 'display' is not defined

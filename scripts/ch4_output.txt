@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/alan/Documents/GitHub/alanlujan91/merino/scripts/Ch4. Multiple Regression Analysis - Inference.py", line 240, in <module>
-    display(manual_test_results)
-    ^^^^^^^
-NameError: name 'display' is not defined

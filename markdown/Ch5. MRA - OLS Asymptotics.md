@@ -1,16 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks//ipynb,markdown//md,scripts//py
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.18.1
-  kernelspec:
-    display_name: merino
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.2
+kernelspec:
+  display_name: merino
+  language: python
+  name: python3
 ---
 
 # Chapter 5: Multiple Regression Analysis - OLS Asymptotics
@@ -65,7 +63,7 @@ We will use simulations to visualize these concepts and then apply the Lagrange 
 - This chapter demonstrates that normality is **not necessary** for large-sample inference
 - These results justify the robustness claims made in Chapter 4 about t-tests with $n \geq 30$
 
-```python
+```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -146,7 +144,7 @@ $$E(v | \text{educ}) = \beta_2 E(\text{ability} | \text{educ}) \neq 0$$
 
 This violates MLR.4, so $\hat{\beta}_1$ is **inconsistent** even as $n \to \infty$!
 
-```python
+```{code-cell} ipython3
 # Demonstrate consistency vs inconsistency with simulation
 np.random.seed(42)
 
@@ -345,7 +343,7 @@ OLS can be **inefficient** (not best) when:
 
 ### 5.3.3 Trade-off: Efficiency vs Robustness
 
-```python
+```{code-cell} ipython3
 # Simulate efficiency comparison: OLS vs WLS under heteroskedasticity
 np.random.seed(123)
 n = 500
@@ -440,7 +438,7 @@ where $S$ = skewness, $K$ = kurtosis of residuals.
 
 **Example: Jarque-Bera Test**
 
-```python
+```{code-cell} ipython3
 # Perform Jarque-Bera test on wage equation residuals
 wage1 = woo.data('wage1')
 reg = smf.ols('np.log(wage) ~ educ + exper + tenure', data=wage1).fit()
@@ -515,7 +513,7 @@ In this section, we will conduct simulation exercises to illustrate the asymptot
 
 This simulation demonstrates the behavior of the OLS estimator when the error terms are normally distributed.  Under the classical linear model assumptions, including normally distributed errors, the OLS estimators are not only BLUE (Best Linear Unbiased Estimator) but also have desirable properties even in small samples. Asymptotically, the OLS estimator is consistent and normally distributed. We will visualize how the distribution of the estimated coefficient $\hat{\beta}_1$ approaches a normal distribution as the sample size $n$ increases.
 
-```python
+```{code-cell} ipython3
 # Monte Carlo Simulation Setup: OLS with Normal Errors
 # Demonstrates convergence to normality as sample size increases
 
@@ -656,7 +654,7 @@ In this simulation, we investigate what happens when one of the classical linear
 
 First, let's visualize the shape of the standardized Chi-squared distribution compared to the standard normal distribution.
 
-```python
+```{code-cell} ipython3
 # support of normal density:
 x_range = np.linspace(-4, 4, num=100)
 
@@ -690,7 +688,7 @@ plt.show()
 
 The plot above shows that the standardized Chi-squared distribution is skewed to the right and has a different shape compared to the standard normal distribution. Now, let's perform the simulation with these non-normal errors.
 
-```python
+```{code-cell} ipython3
 # set the random seed for reproducibility:
 np.random.seed(1234567)
 
@@ -778,7 +776,7 @@ This simulation demonstrates the power of the Central Limit Theorem in action. E
 
 In previous simulations (5.1.1 and 5.1.2), we fixed the regressors $x$ across replications for each sample size $n$. This is akin to *conditioning on the regressors*. In econometric theory, we often derive properties of OLS estimators *conditional* on the observed values of the regressors. However, in reality, regressors are also random variables. This simulation explores the implications of *not conditioning* on the regressors by drawing new samples of $x$ in each replication, along with new error terms. We will see if the asymptotic normality of $\hat{\beta}_1$ still holds when both $x$ and $u$ are randomly drawn in each simulation run.
 
-```python
+```{code-cell} ipython3
 # set the random seed for reproducibility:
 np.random.seed(1234567)
 
@@ -909,7 +907,7 @@ The restricted model under $H_0$ is:
 
 $$\text{narr86} = \beta_0 + \beta_1 \cdot \text{pcnv} + \beta_4 \cdot \text{ptime86} + \beta_5 \cdot \text{qemp86} + u$$
 
-```python
+```{code-cell} ipython3
 crime1 = woo.dataWoo("crime1")
 
 # 1. Estimate the restricted model under H0: beta_avgsen = 0 and beta_tottime = 0
@@ -925,7 +923,7 @@ pd.DataFrame(
 )
 ```
 
-```python
+```{code-cell} ipython3
 # 2. Obtain residuals from the restricted model and add them to the DataFrame
 crime1["utilde"] = fit_r.resid
 
@@ -945,7 +943,7 @@ pd.DataFrame(
 )
 ```
 
-```python
+```{code-cell} ipython3
 # 4. Calculate the LM test statistic: LM = n * R^2_utilde
 LM = r2_LM * fit_LM.nobs
 # Display LM Test Statistic
@@ -957,7 +955,7 @@ pd.DataFrame(
 )
 ```
 
-```python
+```{code-cell} ipython3
 # 5. Determine the critical value from the chi-squared distribution with q=2 degrees of freedom at alpha=10% significance level
 # For a test at 10% significance level, alpha = 0.10.
 # We want to find the chi-squared value such that the area to the right is 0.10.
@@ -973,7 +971,7 @@ pd.DataFrame(
 )
 ```
 
-```python
+```{code-cell} ipython3
 # 6. Calculate the p-value for the LM test
 # The p-value is the probability of observing a test statistic as extreme as, or more extreme than, the one calculated, under the null hypothesis.
 pval = 1 - stats.chi2.cdf(LM, 2)  # cdf is the cumulative distribution function
@@ -986,7 +984,7 @@ pd.DataFrame(
 )
 ```
 
-```python
+```{code-cell} ipython3
 # 7. Compare the LM test to the F-test for the same hypothesis using the unrestricted model directly.
 reg = smf.ols(
     formula="narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86",

@@ -1,16 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks//ipynb,markdown//md,scripts//py
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.18.1
-  kernelspec:
-    display_name: merino
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.2
+kernelspec:
+  display_name: merino
+  language: python
+  name: python3
 ---
 
 # Chapter 8: Heteroskedasticity
@@ -61,11 +59,11 @@ We will cover:
 
 First, let's install and import the necessary libraries.
 
-```python
+```{code-cell} ipython3
 # %pip install numpy pandas patsy statsmodels wooldridge -q
 ```
 
-```python
+```{code-cell} ipython3
 import numpy as np
 import pandas as pd
 import patsy as pt  # Used for creating design matrices easily from formulas
@@ -85,7 +83,7 @@ Using robust standard errors allows for valid t-tests, F-tests, and confidence i
 
 We estimate a model for college cumulative GPA (`cumgpa`) using data for students observed in the spring semester (`spring == 1`). We compare the standard OLS results with results using robust standard errors.
 
-```python
+```{code-cell} ipython3
 # Load the GPA data
 gpa3 = wool.data("gpa3")
 
@@ -166,7 +164,7 @@ display(table_refined)
 
 Robust standard errors can also be used for hypothesis tests involving multiple restrictions, such as F-tests. We test the joint significance of the race dummies (`black` and `white`), comparing the standard F-test (assuming homoskedasticity) with robust F-tests.
 
-```python
+```{code-cell} ipython3
 # Reload data if needed
 gpa3 = wool.data("gpa3")
 
@@ -256,7 +254,7 @@ The test involves:
 
 We test for heteroskedasticity in a model explaining house prices (`price`) using lot size (`lotsize`), square footage (`sqrft`), and number of bedrooms (`bdrms`).
 
-```python
+```{code-cell} ipython3
 # Load housing price data
 hprice1 = wool.data("hprice1")
 
@@ -277,7 +275,7 @@ table_results = pd.DataFrame(
 table_results  # Display OLS estimates
 ```
 
-```python
+```{code-cell} ipython3
 # --- Breusch-Pagan Test (LM version) using statsmodels function ---
 # We need the residuals from the original model and the design matrix (X).
 # patsy.dmatrices helps create the X matrix easily from the formula.
@@ -344,7 +342,7 @@ test_decision = pd.DataFrame(
 test_decision
 ```
 
-```python
+```{code-cell} ipython3
 # --- Breusch-Pagan Test (F version) calculated manually ---
 # This demonstrates the underlying steps.
 
@@ -384,7 +382,7 @@ An F-test (or LM test) for $H_0: \delta_1 = 0, \delta_2 = 0$ is performed.
 
 Often, taking the logarithm of the dependent variable can mitigate heteroskedasticity. We now test the log-log housing price model.
 
-```python
+```{code-cell} ipython3
 # Load housing price data again if needed
 hprice1 = wool.data("hprice1")
 
@@ -419,7 +417,7 @@ pd.DataFrame(
 # to the log predictors in this log-transformed model.
 ```
 
-```python
+```{code-cell} ipython3
 # --- White Test (Simplified Version using Fitted Values, Log Model) ---
 # Create the design matrix for the White test auxiliary regression
 X_wh_log = pd.DataFrame(
@@ -462,7 +460,7 @@ In practice, $h(X)$ is unknown, so we use an estimate $\hat{h}(X)$. This leads t
 
 We model net total financial assets (`nettfa`) for single-person households (`fsize == 1`) as a function of income (`inc`), age (`age`), gender (`male`), and 401k eligibility (`e401k`). It's plausible that the variance of `nettfa` increases with income. We assume $Var(u|inc, age, ...) = \sigma^2 inc$. Thus, the standard deviation is $\sigma \sqrt{inc}$, and the appropriate weight for WLS is $w = 1/inc$.
 
-```python
+```{code-cell} ipython3
 # Load 401k subsample data
 k401ksubs = wool.data("401ksubs")
 
@@ -492,7 +490,7 @@ table_ols = pd.DataFrame(
 table_ols  # Display OLS with robust SEs
 ```
 
-```python
+```{code-cell} ipython3
 # --- WLS Estimation (Assuming Var = sigma^2 * inc) ---
 # Define the weights as 1/inc. statsmodels expects a list or array of weights.
 wls_weight = list(1 / k401ksubs_sub["inc"])
@@ -529,7 +527,7 @@ table_wls  # Display WLS estimates
 
 What if our assumed variance function ($Var = \sigma^2 inc$) is wrong? The WLS estimator will still be consistent (under standard assumptions) but its standard errors might be incorrect, and it might not be efficient. We can compute robust standard errors *for the WLS estimator* to get valid inference even if the weights are misspecified.
 
-```python
+```{code-cell} ipython3
 # Reload data and prepare WLS if needed
 k401ksubs = wool.data("401ksubs")
 k401ksubs_sub = k401ksubs[k401ksubs["fsize"] == 1].copy()
@@ -554,7 +552,7 @@ table_default_wls = pd.DataFrame(
 table_default_wls  # Display Default WLS SEs
 ```
 
-```python
+```{code-cell} ipython3
 # --- WLS Results with Robust (HC3) Standard Errors ---
 # Fit the WLS model but request robust standard errors.
 results_wls_robust = reg_wls.fit(cov_type="HC3")
@@ -592,7 +590,7 @@ Here, we don't assume the form of heteroskedasticity beforehand. Instead, we est
 4.  Obtain the fitted values from this regression, $\widehat{\log(u^2)}$. Exponentiate to get estimates of the variance: $\hat{h} = \exp(\widehat{\log(u^2)})$.
 5.  Use weights $w = 1/\hat{h}$ in a WLS estimation of the original model.
 
-```python
+```{code-cell} ipython3
 # Load smoking data
 smoke = wool.data("smoke")
 
@@ -615,7 +613,7 @@ table_ols_smoke = pd.DataFrame(
 table_ols_smoke  # Display OLS estimates
 ```
 
-```python
+```{code-cell} ipython3
 # --- Test for Heteroskedasticity (BP Test) ---
 y_smoke, X_smoke = pt.dmatrices(
     "cigs ~ np.log(income) + np.log(cigpric) + educ +age + I(age**2) + restaurn",
@@ -638,7 +636,7 @@ pd.DataFrame(
 # the null of homoskedasticity. FGLS is likely warranted for efficiency.
 ```
 
-```python
+```{code-cell} ipython3
 # --- Step 2 & 3: Model the Variance Function ---
 # Get residuals, square them, take the log (add small constant if any residuals are zero)
 smoke["resid_ols"] = results_ols_smoke.resid
@@ -672,7 +670,7 @@ table_varfunc  # Display variance function estimates
 # appear significant predictors of the variance.
 ```
 
-```python
+```{code-cell} ipython3
 # --- Step 4 & 5: FGLS Estimation using Estimated Weights ---
 # Get fitted values from the variance function regression
 smoke["logh_hat"] = results_varfunc.fittedvalues
@@ -751,7 +749,7 @@ Since $p_i = \beta_0 + \beta_1 x_{i1} + \cdots + \beta_k x_{ik}$ varies across o
 
 The standard practice for LPM is to estimate with OLS and use **heteroskedasticity-robust standard errors**:
 
-```python
+```{code-cell} ipython3
 # Example: Labor force participation from Ch7
 mroz = wool.data("mroz")
 
@@ -817,7 +815,7 @@ where $p_i = \mathbf{x}_i' \boldsymbol{\beta}$ is unknown. The **feasible WLS** 
 
 **Implementation:**
 
-```python
+```{code-cell} ipython3
 # Step 1: Get fitted probabilities from OLS
 mroz["p_hat"] = results_lpm_ols.fittedvalues
 
@@ -866,7 +864,7 @@ While WLS addresses the known heteroskedasticity in LPM, there are practical iss
 
 **1. Predicted probabilities outside [0, 1]:**
 
-```python
+```{code-cell} ipython3
 # Check range of fitted probabilities
 print(f"Range of OLS fitted values: [{results_lpm_ols.fittedvalues.min():.4f}, {results_lpm_ols.fittedvalues.max():.4f}]")
 print(
@@ -889,7 +887,7 @@ print(
 
 **3. WLS standard errors may still be incorrect:**
 
-```python
+```{code-cell} ipython3
 # Even WLS should use robust SEs as a precaution
 results_lpm_wls_robust = lpm_wls.fit(cov_type="HC3")
 
@@ -934,7 +932,7 @@ Based on the analysis above, here are practical guidelines:
 - For policy analysis requiring precise probability estimates
 - $\to$ Use probit or logit models instead (Chapter 17)
 
-```python
+```{code-cell} ipython3
 # Summary comparison: Which method to use?
 methods_comparison = pd.DataFrame(
     {

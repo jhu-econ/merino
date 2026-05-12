@@ -1,16 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks//ipynb,markdown//md,scripts//py
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.18.1
-  kernelspec:
-    display_name: merino
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.2
+kernelspec:
+  display_name: merino
+  language: python
+  name: python3
 ---
 
 # Chapter 9: Specification and Data Issues
@@ -46,11 +44,11 @@ The organization follows a hierarchical development from foundational concepts t
 
 Throughout this chapter, we demonstrate theoretical results through simulation studies and illustrate practical applications using real econometric datasets. The chapter concludes with comprehensive guidance on diagnostic procedures and decision frameworks for applied research.
 
-```python
+```{code-cell} ipython3
 # %pip install matplotlib numpy pandas statsmodels wooldridge scipy -q
 ```
 
-```python
+```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -94,7 +92,7 @@ and tests the joint hypothesis $H_0: \delta_2 = \delta_3 = 0$ using an F-test. U
 
 We apply the RESET test to the housing price model from Chapter 8. The baseline specification regresses house price (in thousands of dollars) on lot size, square footage, and number of bedrooms. This linear specification imposes constant marginal effects and rules out interaction terms or non-linearities in these relationships.
 
-```python
+```{code-cell} ipython3
 # RESET Test Implementation: Detecting Functional Form Misspecification
 # The test adds powers of fitted values to detect omitted nonlinearities
 
@@ -173,7 +171,7 @@ reset_table = pd.DataFrame(
 display(reset_table)
 ```
 
-```python
+```{code-cell} ipython3
 # 4. Perform an F-test for the joint significance of the added terms
 # H0: Coefficients on fitted_sq and fitted_cub are both zero.
 hypotheses = ["fitted_sq = 0", "fitted_cub = 0"]
@@ -199,7 +197,7 @@ reset_manual
 
 `statsmodels` also provides a convenient function for the RESET test.
 
-```python
+```{code-cell} ipython3
 # Reload data if needed
 hprice1 = wool.data("hprice1")
 
@@ -237,7 +235,7 @@ The test involves augmenting one model (Model 1) with the fitted values from the
 
 Here, we compare the linear housing price model (Model 1) with a log-log model (Model 2).
 
-```python
+```{code-cell} ipython3
 # Reload data if needed
 hprice1 = wool.data("hprice1")
 
@@ -281,7 +279,7 @@ anovaResults1
 # Model 1 appears misspecified relative to the comprehensive model.
 ```
 
-```python
+```{code-cell} ipython3
 # Test Model 2 vs Comprehensive Model:
 # H0: Coefficients on lotsize and sqrft are zero (i.e., Model 2 is adequate)
 # This tests if Model 1's unique terms add significant explanatory power to Model 2.
@@ -345,7 +343,7 @@ We use simulations to illustrate these effects.
 
 We simulate data where the true model is $y^* = \beta_0 + \beta_1 x + u$, but we observe $y = y^* + e_0$. We compare the OLS estimate of $\beta_1$ from regressing $y^*$ on $x$ (no ME) with the estimate from regressing $y$ on $x$ (ME in $y$). The true $\beta_1 = 0.5$.
 
-```python
+```{code-cell} ipython3
 # Set the random seed for reproducibility
 np.random.seed(1234567)
 
@@ -407,7 +405,7 @@ pd.DataFrame(
 # cause bias in the OLS coefficient estimates.
 ```
 
-```python
+```{code-cell} ipython3
 # Analyze the simulation results: Variance of the estimated beta1 across repetitions
 b1_var = np.var(b1, ddof=1)  # Use ddof=1 for sample variance
 b1_me_var = np.var(b1_me, ddof=1)
@@ -428,7 +426,7 @@ pd.DataFrame(
 
 Now, we simulate data where the true model is $y = \beta_0 + \beta_1 x^* + u$, but we observe $x = x^* + e_1$. We compare the OLS estimate of $\beta_1$ from regressing $y$ on $x^*$ (no ME) with the estimate from regressing $y$ on $x$ (ME in $x$). The true $\beta_1 = 0.5$.
 
-```python
+```{code-cell} ipython3
 # Set the random seed
 np.random.seed(1234567)
 
@@ -503,7 +501,7 @@ pd.DataFrame(
 # Expected estimate = beta1 * (1 / (1+1)) = 0.5 * 0.5 = 0.25. The simulation matches this.
 ```
 
-```python
+```{code-cell} ipython3
 # Analyze the simulation results: Variance of the estimated beta1
 b1_var = np.var(b1, ddof=1)
 b1_me_var = np.var(b1_me, ddof=1)
@@ -530,7 +528,7 @@ Missing data is a common problem in empirical research. Values for certain varia
 *   **Listwise Deletion:** Most statistical software, including `statsmodels` by default, handles missing data by **listwise deletion**. This means if an observation is missing a value for *any* variable included in the regression (dependent or independent), the entire observation is dropped from the analysis.
 *   **Potential Bias:** Listwise deletion is acceptable if data are **Missing Completely At Random (MCAR)**. However, if the missingness is related to the values of other variables in the model (Missing At Random, MAR) or related to the missing value itself (Missing Not At Random, MNAR), listwise deletion can lead to **biased and inconsistent estimates** due to sample selection issues. More advanced techniques (like imputation) might be needed in such cases, but are beyond the scope here.
 
-```python
+```{code-cell} ipython3
 # Demonstrate how NumPy handles NaN and Inf in calculations
 x = np.array([-1, 0, 1, np.nan, np.inf, -np.inf])
 logx = np.log(x)  # log(-1)=NaN, log(0)=-Inf
@@ -549,7 +547,7 @@ results_np_handling
 
 Now, let's examine missing data in a real dataset (`lawsch85`).
 
-```python
+```{code-cell} ipython3
 # Missing Data Analysis: Law School Dataset
 # Demonstrates detection and handling of missing values
 
@@ -588,7 +586,7 @@ missing_preview
 # Note: NaN indicates missing LSAT scores for some schools
 ```
 
-```python
+```{code-cell} ipython3
 # Calculate frequencies of missing vs. non-missing LSAT scores
 freq_missLSAT = pd.crosstab(lsat_missing, columns="count")
 # Frequency of Missing LSAT
@@ -596,7 +594,7 @@ freq_missLSAT
 # Shows 7 schools have missing LSAT scores.
 ```
 
-```python
+```{code-cell} ipython3
 # Check for missings across all variables in the DataFrame
 miss_all = lawsch85.isna()  # Creates a boolean DataFrame of the same shape
 colsums = miss_all.sum(
@@ -608,7 +606,7 @@ colsums.to_frame("Missing Count")
 # Shows several variables have missing values.
 ```
 
-```python
+```{code-cell} ipython3
 # Calculate the number of complete cases (no missing values in any column for that row)
 # Sum missings across rows (axis=1). If sum is 0, the case is complete.
 complete_cases = miss_all.sum(axis=1) == 0
@@ -622,7 +620,7 @@ freq_complete_cases
 
 How do standard functions handle missing data?
 
-```python
+```{code-cell} ipython3
 # Load data again if needed
 lawsch85 = wool.data("lawsch85")
 
@@ -642,7 +640,7 @@ pd.DataFrame(
 )
 ```
 
-```python
+```{code-cell} ipython3
 # --- Missing value handling in pandas ---
 x_pd = lawsch85["LSAT"]  # Keep as pandas Series
 # By default, pandas methods often skip NaNs
@@ -661,7 +659,7 @@ pd.DataFrame(
 
 How does `statsmodels` handle missing data during regression?
 
-```python
+```{code-cell} ipython3
 # Get the dimensions of the full dataset
 # Original dataset shape
 pd.DataFrame(
@@ -672,7 +670,7 @@ pd.DataFrame(
 )
 ```
 
-```python
+```{code-cell} ipython3
 # --- Regression with statsmodels and Missing Data ---
 # Estimate a model for log(salary) using LSAT, cost, and age.
 # Some of these variables have missing values.
@@ -701,7 +699,7 @@ pd.DataFrame(
 **Studentized residuals** (or externally studentized residuals) are a useful diagnostic tool. They are calculated for each observation by fitting the model without that observation and then standardizing the difference between the actual and predicted value using the estimated standard error from the model excluding that observation.
 *   Observations with large studentized residuals (e.g., absolute value > 2 or 3) are potential outliers that warrant investigation.
 
-```python
+```{code-cell} ipython3
 # Load R&D intensity data
 rdchem = wool.data("rdchem")
 
@@ -733,7 +731,7 @@ pd.DataFrame(
 
 Visualizing the distribution of studentized residuals can also be helpful.
 
-```python
+```{code-cell} ipython3
 # Plot a histogram of the studentized residuals with an overlaid kernel density estimate
 
 # Fit kernel density estimator
@@ -780,7 +778,7 @@ $$ \min_{\beta_0, ..., \beta_k} \sum_{i=1}^n |y_i - \beta_0 - \beta_1 x_{i1} - .
 
 We compare OLS and LAD estimates for the R&D intensity model.
 
-```python
+```{code-cell} ipython3
 # Load data if needed
 rdchem = wool.data("rdchem")
 
@@ -802,7 +800,7 @@ table_ols = pd.DataFrame(
 table_ols
 ```
 
-```python
+```{code-cell} ipython3
 # --- LAD Regression (Quantile Regression at the Median) ---
 # Use smf.quantreg and specify the quantile q=0.5 for LAD.
 reg_lad = smf.quantreg(formula="rdintens ~ I(sales/1000) + profmarg", data=rdchem)
@@ -910,7 +908,7 @@ $$
 
 **Proxy solution:** Use IQ score as a proxy for ability.
 
-```python
+```{code-cell} ipython3
 # Simulated example: Returns to education with ability proxy
 np.random.seed(42)
 n = 1000
@@ -956,7 +954,7 @@ print("IQ-Ability correlation:", np.corrcoef(iq, ability_star)[0, 1].round(3))
 
 **Model 1: Naive regression (omitting ability)**
 
-```python
+```{code-cell} ipython3
 # Model without ability (omitted variable bias)
 model_naive = smf.ols(formula="log_wage ~ educ + exper", data=wage_data)
 results_naive = model_naive.fit()
@@ -969,7 +967,7 @@ print(f"  Bias: {results_naive.params['educ'] - 0.08:.4f}")
 
 **Model 2: Using IQ as proxy**
 
-```python
+```{code-cell} ipython3
 # Model with IQ as proxy for ability
 model_proxy = smf.ols(formula="log_wage ~ educ + exper + iq", data=wage_data)
 results_proxy = model_proxy.fit()
@@ -982,7 +980,7 @@ print(f"  Bias: {results_proxy.params['educ'] - 0.08:.4f}")
 
 **Model 3: Oracle (using true ability - infeasible in practice)**
 
-```python
+```{code-cell} ipython3
 # Model with true ability (infeasible in reality)
 model_oracle = smf.ols(
     formula="log_wage ~ educ + exper + ability_star",
@@ -1140,7 +1138,7 @@ $$
 
 where $a_i$ is individual-specific deviation in the education return (correlated with ability).
 
-```python
+```{code-cell} ipython3
 # Simulate random coefficient model
 np.random.seed(123)
 n = 500

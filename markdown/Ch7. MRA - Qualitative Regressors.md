@@ -1,16 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks//ipynb,markdown//md,scripts//py:percent
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.18.1
-  kernelspec:
-    display_name: merino
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.2
+kernelspec:
+  display_name: merino
+  language: python
+  name: python3
 ---
 
 # Chapter 7: Multiple Regression Analysis with Qualitative Regressors
@@ -41,7 +39,7 @@ Incorporating categorical variables into regression models enables researchers t
 
 The presentation builds systematically from basic dummy variable techniques to advanced applications. We begin with binary dummy variables and their interpretation as intercept shifts (Section 7.1), extend to categorical variables with multiple categories (Section 7.2), examine interaction terms between qualitative and quantitative variables allowing for slope differences (Section 7.3), address the linear probability model for binary dependent variables (Section 7.4-7.6), develop difference-in-differences methods for program evaluation (Section 7.7), and conclude with the Chow test for structural breaks (Section 7.8). Throughout, we implement these methods using Python's statsmodels library with real datasets from applied econometric research.
 
-```python
+```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np  # noqa: F401
 import pandas as pd
@@ -72,7 +70,7 @@ Dummy variables (also called indicator variables or binary variables) take on th
 
 In this example, we will investigate how gender affects hourly wages, controlling for education, experience, and tenure. We will use the `wage1` dataset from the `wooldridge` package. The dataset includes information on wages, education, experience, tenure, and gender (female=1 if female, 0 if male).
 
-```python
+```{code-cell} ipython3
 # Load wage dataset for dummy variable analysis
 wage1 = wool.data("wage1")
 
@@ -162,7 +160,7 @@ Using the logarithm of the dependent variable, such as wage, is common in econom
 
 In this example, we will use the natural logarithm of hourly wage as the dependent variable and explore the interaction effect between marital status and gender, along with education, experience, and tenure (including quadratic terms for experience and tenure to capture potential non-linear relationships).
 
-```python
+```{code-cell} ipython3
 wage1 = wool.data("wage1")
 
 reg = smf.ols(
@@ -220,7 +218,7 @@ In Python (and programming in general), boolean variables are often used to repr
 
 In the `wage1` dataset, the `female` variable is already coded as 1 for female and 0 for male. We can explicitly create a boolean variable, although it is not strictly necessary in this case as `statsmodels` and regression formulas in general can interpret 1/0 variables as dummy variables.
 
-```python
+```{code-cell} ipython3
 wage1 = wool.data("wage1")
 
 # regression with boolean variable:
@@ -259,7 +257,7 @@ Categorical variables represent groups or categories, and they can have more tha
 
 In this section, we will use the `cps78_85` dataset from the Wooldridge package, which contains data from the Current Population Survey for 1978 and 1985. We will investigate how gender, region (south/non-south), and union membership affect wages, controlling for education and experience.
 
-```python
+```{code-cell} ipython3
 cps = wool.data("cps78_85")
 
 # Create categorical gender variable for clearer output
@@ -293,7 +291,7 @@ freq_union
 
 The frequency tables show the counts for each category in the dataset, giving us an overview of the distribution of these categorical variables across the sample.
 
-```python
+```{code-cell} ipython3
 # directly using categorical variables in regression formula:
 reg = smf.ols(
     formula="lwage ~ educ + exper + C(gender) + C(region) + C(union_member)",
@@ -327,7 +325,7 @@ table  # Display regression results
 - **educ and exper:** The coefficients represent the effect of each additional year of education or experience on log wage, holding gender, region, union membership, and the other variable constant.
 - **P-values:** Small p-values indicate that the corresponding variable is a statistically significant predictor of log wage.
 
-```python
+```{code-cell} ipython3
 # rerun regression with different reference category:
 reg_newref = smf.ols(
     formula="lwage ~ educ + exper + "
@@ -370,7 +368,7 @@ By using `C()` and `Treatment()`, we can easily incorporate categorical variable
 
 ANOVA (Analysis of Variance) tables in regression context help to assess the overall significance of groups of regressors. They decompose the total variance in the dependent variable into components attributable to different sets of regressors. In the context of categorical variables, ANOVA tables can be used to test the joint significance of all dummy variables representing a categorical variable.
 
-```python
+```{code-cell} ipython3
 cps = wool.data("cps78_85")
 # Create categorical variables
 cps["gender"] = cps["female"].map({0: "male", 1: "female"})
@@ -399,7 +397,7 @@ table_reg  # Display regression results
 
 - `formula="lwage ~ educ + exper + gender + region + union"`: In this formula, we are directly using `gender` and `region` as categorical variables without explicitly using `C()`. `statsmodels` can automatically detect categorical variables (especially string or object type columns) and treat them as such in the regression formula, creating dummy variables behind the scenes. The `union` variable is binary (0/1), so it enters directly as a dummy variable. However, it is generally better to be explicit and use `C()` for clarity and control, especially when you want to specify reference categories.
 
-```python
+```{code-cell} ipython3
 # ANOVA table:
 table_anova = sm.stats.anova_lm(results, typ=2)
 # ANOVA table
@@ -444,7 +442,7 @@ Sometimes, it might be useful to convert a continuous numeric variable into a ca
 
 In this example, we will examine the effect of law school rankings on starting salaries of graduates. The `lawsch85` dataset from `wooldridge` contains information on law school rankings (`rank`), starting salaries (`salary`), LSAT scores (`LSAT`), GPA, library volumes (`libvol`), and cost (`cost`).
 
-```python
+```{code-cell} ipython3
 lawsch85 = wool.data("lawsch85")
 
 # define cut points for the rank:
@@ -477,7 +475,7 @@ freq
 
 The `freq` output shows the number of law schools falling into each defined rank category (e.g., how many schools are ranked between 0 and 10, between 10 and 25, etc.).
 
-```python
+```{code-cell} ipython3
 # run regression:
 reg = smf.ols(
     formula='np.log(salary) ~ C(rc, Treatment("(100,175]")) +'
@@ -510,7 +508,7 @@ table_reg  # Display regression results
 - **C(rc)[T.(0,10)] to C(rc)[T.(60,100)]:** The coefficients for `C(rc)[T.(0,10)]`, `C(rc)[T.(10,25)]`, `C(rc)[T.(25,40)]`, `C(rc)[T.(40,60)]`, and `C(rc)[T.(60,100)]` represent the log salary difference between law schools in each of these rank categories and law schools in the reference category "(100,175]", holding LSAT, GPA, library volumes, and cost constant. For example, `C(rc)[T.(0,10)]` coefficient would represent the approximate percentage salary premium for graduates of law schools ranked (0, 10] compared to those from schools ranked (100, 175]. We expect these coefficients to be positive and decreasing as the rank category range increases (i.e., better ranked schools should have higher starting salaries).
 - **LSAT, GPA, np.log(libvol), np.log(cost):** These coefficients represent the effects of LSAT score, GPA, log of library volumes, and log of cost on log salary, controlling for law school rank category.
 
-```python
+```{code-cell} ipython3
 # ANOVA table:
 table_anova = sm.stats.anova_lm(results, typ=2)
 # ANOVA table
@@ -525,7 +523,7 @@ As before, `sm.stats.anova_lm(results, typ=2)` calculates the ANOVA table for th
 
 We can allow for regression functions to differ across groups by including interaction terms between group indicators (dummy variables for qualitative variables) and quantitative regressors. This allows the slope coefficients of the quantitative regressors to vary across different groups defined by the qualitative variable.
 
-```python
+```{code-cell} ipython3
 gpa3 = wool.data("gpa3")
 
 # model with full interactions with female dummy (only for spring data):
@@ -574,7 +572,7 @@ To get the regression equation for each group:
   `cumgpa = (b_const + b_female) + (b_sat + b_female:sat) * sat + (b_hsperc + b_female:hsperc) * hsperc + (b_tothrs + b_female:tothrs) * tothrs`
   (where `b_female`, `b_female:sat`, `b_female:hsperc`, `b_female:tothrs` are the coefficients for `female`, `female:sat`, `female:hsperc`, `female:tothrs` respectively).
 
-```python
+```{code-cell} ipython3
 # F-Test for H0 (the interaction coefficients of 'female' are zero):
 hypotheses = ["female:sat = 0", "female:hsperc = 0", "female:tothrs = 0"]
 ftest = results.f_test(hypotheses)
@@ -600,7 +598,7 @@ pd.DataFrame(
 
 - **p-value (fpval):** If the p-value is small (e.g., < 0.05), we reject the null hypothesis. This would mean that at least one of the interaction coefficients is significantly different from zero, indicating that the effect of at least one of the quantitative regressors (`sat`, `hsperc`, `tothrs`) on `cumgpa` differs between females and males. If the p-value is large, we fail to reject the null hypothesis, suggesting that there is not enough evidence to conclude that the slopes are different across genders.
 
-```python
+```{code-cell} ipython3
 gpa3 = wool.data("gpa3")
 
 # estimate model for males (& spring data):
@@ -633,7 +631,7 @@ table_m
 
 The regression table `table_m` shows the estimated regression equation specifically for male students. The coefficients are the intercept and slopes of `sat`, `hsperc`, and `tothrs` for males only. These coefficients should be very similar to the coefficients for `const`, `sat`, `hsperc`, and `tothrs` in the full interaction model (from the first regression in this section), as those were also interpreted as the coefficients for the male group (reference group).
 
-```python
+```{code-cell} ipython3
 # estimate model for females (& spring data):
 reg_f = smf.ols(
     formula="cumgpa ~ sat + hsperc + tothrs",
@@ -714,7 +712,7 @@ $$
 
 Let's examine married women's labor force participation using the `mroz` dataset:
 
-```python
+```{code-cell} ipython3
 # Load data
 mroz = wool.data("mroz")
 
@@ -751,7 +749,7 @@ Looking at key coefficients:
 
 ### 7.6.3 Predicted Probabilities and Limitations
 
-```python
+```{code-cell} ipython3
 # Calculate predicted probabilities
 mroz["pred_prob"] = results_lpm.fittedvalues
 
@@ -822,7 +820,7 @@ plt.show()
 
 Since LPM has heteroskedastic errors by construction, we should use **heteroskedasticity-robust standard errors** (covered in Chapter 8):
 
-```python
+```{code-cell} ipython3
 # Re-estimate with robust standard errors
 results_lpm_robust = lpm.fit(cov_type="HC3")
 
@@ -875,7 +873,7 @@ where:
 
 Consider evaluating a job training program's effect on earnings. We use hypothetical data similar to Wooldridge Example 7.9:
 
-```python
+```{code-cell} ipython3
 # Simulate job training data (similar structure to real evaluations)
 np.random.seed(42)
 n = 500
@@ -919,7 +917,7 @@ print(f"Control group: {(1-treatment).sum()} ({100*(1-treatment).mean():.1f}%)")
 
 **Naive comparison (without regression adjustment):**
 
-```python
+```{code-cell} ipython3
 # Simple mean difference (biased if groups differ in observables)
 mean_treat = train_data[train_data["treatment"] == 1]["earnings"].mean()
 mean_control = train_data[train_data["treatment"] == 0]["earnings"].mean()
@@ -935,7 +933,7 @@ This naive comparison may be biased if treatment and control groups differ in ch
 
 **Regression-adjusted estimate:**
 
-```python
+```{code-cell} ipython3
 # Estimate with regression adjustment
 eval_model = smf.ols(
     formula="earnings ~ treatment + educ + age + prior_earn",
@@ -984,7 +982,7 @@ where:
 - $\beta_2$: Time trend affecting both groups
 - $\delta_0$: Additional change in treatment group beyond time trend
 
-```python
+```{code-cell} ipython3
 # Simulate difference-in-differences data
 np.random.seed(123)
 n_units = 250  # Units per group
@@ -1110,7 +1108,7 @@ If we reject $H_0$, the regression functions differ significantly between groups
 
 Let's test whether the wage-education relationship differs by gender:
 
-```python
+```{code-cell} ipython3
 # Use wage1 data
 wage1 = wool.data("wage1")
 
@@ -1172,7 +1170,7 @@ else:
 
 **Alternative: F-test on interaction model**
 
-```python
+```{code-cell} ipython3
 # Full interaction model
 interact_model = smf.ols(
     formula="np.log(wage) ~ female * (educ + exper + I(exper**2) + tenure + I(tenure**2))",
@@ -1213,7 +1211,7 @@ $$
 
 This is simply a t-test on a single dummy variable:
 
-```python
+```{code-cell} ipython3
 # Model with only intercept difference (no slope interactions)
 intercept_only = smf.ols(
     formula="np.log(wage) ~ female + educ + exper + I(exper**2) + tenure + I(tenure**2)",
