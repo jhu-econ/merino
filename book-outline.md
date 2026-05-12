@@ -1,4 +1,4 @@
-# Introductory Econometrics: A Modern Approach, 7th Edition
+# Introductory Econometrics: A Modern Approach, 8th Edition
 ## Book Outline
 
 ### Front Matter
@@ -171,7 +171,7 @@ Summary | Key Terms | Problems | Computer Exercises
 
 ## Part 3. Advanced Topics
 
-### Chapter 13. Pooling Cross Sections across Time. Simple Panel Data Methods
+### Chapter 13. Pooling Cross Sections across Time: Simple Panel Data Methods
 
 13-1. Pooling Independent Cross Sections across Time
 13-2. Policy Analysis with Pooled Cross Sections
@@ -195,7 +195,7 @@ Summary | Key Terms | Problems | Computer Exercises | Appendix 14A.
 
 ---
 
-### Chapter 15. Instrumental Variables Estimation and Two Stage Least Squares
+### Chapter 15. Instrumental Variables Estimation and Two-Stage Least Squares
 
 15-1. Motivation: Omitted Variables in a Simple Regression Model
 15-2. IV Estimation of the Multiple Regression Model
@@ -294,7 +294,7 @@ Summary | Key Terms | Sample Empirical Projects | List of Journals | Data Source
 
 ## Coverage Status
 
-### ✅ Completed Chapters (Notebooks Available)
+### ✅ Built Chapters (MyST Markdown)
 - Chapter 2: The Simple Regression Model
 - Chapter 3: Multiple Regression Analysis - Estimation
 - Chapter 4: Multiple Regression Analysis - Inference
@@ -306,11 +306,18 @@ Summary | Key Terms | Sample Empirical Projects | List of Journals | Data Source
 - Chapter 10: Basic Regression Analysis with Time Series Data
 - Chapter 11: Further Issues in Using OLS with Time Series Data
 - Chapter 12: Serial Correlation and Heteroskedasticity in Time Series Regressions
+- Chapter 13: Pooling Cross Sections across Time: Simple Panel Data Methods
+- Chapter 14: Advanced Panel Data Methods
+- Chapter 15: Instrumental Variables Estimation and Two-Stage Least Squares
+- Chapter 16: Simultaneous Equations Models
+- Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections
+- Chapter 18: Advanced Time Series Topics
 
 ### 📋 Planned Chapters
 - Chapter 1: The Nature of Econometrics and Economic Data
-- Chapter 13-20: Advanced Topics
+- Chapter 19: Advanced Methods for Causal Inference
+- Chapter 20: Carrying Out an Empirical Project
 
 ---
 
-*Source: Wooldridge, J. M. (2020). Introductory Econometrics: A Modern Approach (7th ed.). Cengage Learning.*
+*Source: Wooldridge, J. M. (2025). Introductory Econometrics: A Modern Approach (8th ed.). Cengage Learning.*

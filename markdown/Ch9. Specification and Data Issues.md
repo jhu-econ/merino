@@ -1560,7 +1560,7 @@ This chapter covered all 11 learning objectives:
 
 **Recommended resources:**
 
-- Wooldridge (2020), Chapters 9 and 17 for theoretical foundations
+- Wooldridge (2025), Chapters 9 and 17 for theoretical foundations
 - Cameron & Trivedi (2005), "Microeconometrics" for advanced treatment of missing data and outliers
 - Angrist & Pischke (2009), "Mostly Harmless Econometrics" for practical specification advice
 - Fox (2016), "Applied Regression Analysis and GLMs in R" for extensive diagnostic methods
