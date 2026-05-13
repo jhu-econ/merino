@@ -6,12 +6,12 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.2
 kernelspec:
-  display_name: merino
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
-# Chapter 8: Heteroskedasticity
+# 8. Heteroskedasticity
 
 :::{important} Learning Objectives
 :class: dropdown
@@ -60,16 +60,12 @@ We will cover:
 First, let's install and import the necessary libraries.
 
 ```{code-cell} ipython3
-# %pip install numpy pandas patsy statsmodels wooldridge -q
-```
-
-```{code-cell} ipython3
 import numpy as np
 import pandas as pd
-import patsy as pt  # Used for creating design matrices easily from formulas
-import statsmodels.api as sm  # Provides statistical models and tests
-import statsmodels.formula.api as smf  # Convenient formula interface for statsmodels
-import wooldridge as wool  # Access to Wooldridge textbook datasets
+import patsy as pt
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import wooldridge as wool
 from IPython.display import display
 ```
 

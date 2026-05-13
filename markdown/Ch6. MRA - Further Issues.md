@@ -6,12 +6,12 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.2
 kernelspec:
-  display_name: merino
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
-# Chapter 6: Multiple Regression Analysis - Further Issues
+# 6. Multiple Regression Analysis: Further Issues
 
 :::{important} Learning Objectives
 :class: dropdown
@@ -775,10 +775,7 @@ where:
 
 ```{code-cell} ipython3
 # Compare models with different numbers of variables
-import wooldridge as woo
-
-# Load data
-hprice1 = woo.data('hprice1')
+hprice1 = wool.data('hprice1')
 
 # Model 1: Simple model with key variables
 model1 = smf.ols('np.log(price) ~ np.log(lotsize) + np.log(sqrft) + bdrms', data=hprice1).fit()
@@ -1000,7 +997,7 @@ where $\hat{\sigma}^2 = SSR/(n-k-1)$.
 
 ```{code-cell} ipython3
 # Estimate wage equation
-wage1 = woo.data('wage1')
+wage1 = wool.data('wage1')
 log_wage_model = smf.ols('np.log(wage) ~ educ + exper + tenure', data=wage1).fit()
 
 # Predict for specific person
@@ -1075,7 +1072,7 @@ Alternative check for homoskedasticity:
 
 ```{code-cell} ipython3
 # Estimate model
-hprice1 = woo.data('hprice1')
+hprice1 = wool.data('hprice1')
 house_model = smf.ols('price ~ lotsize + sqrft + bdrms', data=hprice1).fit()
 
 # Get residuals and fitted values

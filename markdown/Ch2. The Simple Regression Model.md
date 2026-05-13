@@ -51,8 +51,6 @@ import statsmodels.formula.api as smf
 import wooldridge as wool
 from IPython.display import display
 from scipy import stats
-
-# Set plotting style for enhanced visualizations
 sns.set_style("whitegrid")  # Clean seaborn style with grid
 sns.set_palette("husl")  # Attractive color palette
 plt.rcParams["figure.figsize"] = [10, 6]  # Default figure size
@@ -403,7 +401,7 @@ plot_regression(
 
 The regression plot demonstrates the strong linear relationship between campaign spending share and vote share, with most data points closely following the fitted line.
 
-## 2.2. Coefficients, Fitted Values, and Residuals
+## 2.2 Coefficients, Fitted Values, and Residuals
 
 As we discussed earlier, after estimating the OLS regression, we obtain fitted values ($\hat{y}_i$) and residuals ($\hat{u}_i$). Let's formally define them again:
 
@@ -551,7 +549,7 @@ This code calculates the mean of the residuals, the covariance between education
 The output should show that the mean of residuals is very close to zero (practically zero, given potential floating-point inaccuracies). Similarly, the covariance between education and residuals should be very close to zero. Finally, the predicted wage at the average level of education should be very close to the average wage. These results confirm the mathematical properties of OLS residuals. These properties are not assumptions, but rather outcomes of the OLS estimation procedure.
 :::
 
-## 2.3. Goodness of Fit
+## 2.3 Goodness of Fit
 
 After fitting a regression model, it's important to assess how well the model fits the data. A key measure of goodness of fit in simple linear regression is the R-squared ($R^2$) statistic. R-squared measures the proportion of the total variation in the dependent variable ($y$) that is explained by the independent variable ($x$) in our model.
 
@@ -896,7 +894,7 @@ plt.tight_layout()
 
 The scatter plot visualizes the log-log relationship between firm sales and CEO salary, demonstrating the elasticity concept where both variables are on logarithmic scales.
 
-## 2.5. Regression through the Origin and Regression on a Constant
+## 2.5 Regression through the Origin and Regression on a Constant
 
 In standard simple linear regression, we include an intercept term ($\beta_0$). However, in some cases, it might be appropriate to omit the intercept, forcing the regression line to pass through the origin (0,0). This is called **regression through the origin**. The model becomes:
 
@@ -1051,7 +1049,7 @@ By comparing the results, you can see how the estimated coefficients and R-squar
 In the visualization, you can visually compare the fit of these different regression lines to the data. Notice that R-squared for regression through the origin can sometimes be higher or lower than regular OLS, and it should be interpreted cautiously as the total sum of squares is calculated differently in regression through the origin. Regression on a constant will be a horizontal line at the mean of salary.
 :::
 
-## 2.6. Expected Values, Variances, and Standard Errors
+## 2.6 Expected Values, Variances, and Standard Errors
 
 To understand the statistical properties of OLS estimators, we need to make certain assumptions about the population regression model and the data. These are known as the **Classical Linear Model (CLM) assumptions** for simple linear regression. The first five are often called **SLR assumptions**.
 
@@ -1160,7 +1158,7 @@ This code estimates the regression model, calculates the SER and standard errors
 By comparing the manually calculated SER and standard errors with those reported in the `statsmodels` summary table, you can verify that they are consistent. The standard errors provide a measure of the uncertainty associated with our coefficient estimates. Smaller standard errors mean our estimates are more precise. The regression plot with confidence intervals visually shows the range of plausible regression lines, given the uncertainty in our estimates.
 :::
 
-## 2.7. Causal Inference and Limitations
+## 2.7 Causal Inference and Limitations
 
 While simple regression is powerful for describing relationships between variables, we must be careful when making **causal** interpretations. The slope coefficient $\beta_1$ tells us the association between $x$ and $y$, but correlation does not imply causation. To interpret $\beta_1$ as a causal effect requires strong assumptions that often don't hold with observational data.
 
@@ -1272,7 +1270,7 @@ For $\beta_1$ to represent a **causal effect** of $x$ on $y$, we need:
 
 These conditions are rarely satisfied with observational data, which is why economists often seek **natural experiments** or use more advanced techniques (instrumental variables, difference-in-differences, regression discontinuity) to credibly estimate causal effects.
 
-## 2.8. Potential Outcomes and Randomized Experiments
+## 2.8 Potential Outcomes and Randomized Experiments
 
 Modern causal inference uses the **potential outcomes framework**, which provides a rigorous way to think about causality and connects directly to regression analysis.
 

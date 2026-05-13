@@ -6,12 +6,12 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.2
 kernelspec:
-  display_name: merino
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
-# Chapter 7: Multiple Regression Analysis with Qualitative Regressors
+# 7. Multiple Regression Analysis with Qualitative Regressors
 
 :::{important} Learning Objectives
 :class: dropdown

@@ -6,12 +6,12 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.2
 kernelspec:
-  display_name: merino
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
-# Chapter 5: Multiple Regression Analysis - OLS Asymptotics
+# 5. Multiple Regression Analysis: OLS Asymptotics
 
 :::{important} Learning Objectives
 :class: dropdown
@@ -69,10 +69,8 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
-import wooldridge as woo
+import wooldridge as wool
 from scipy import stats
-
-# Configure matplotlib to avoid font parsing issues
 plt.rcParams['mathtext.fontset'] = 'dejavusans'
 ```
 
@@ -440,7 +438,7 @@ where $S$ = skewness, $K$ = kurtosis of residuals.
 
 ```{code-cell} ipython3
 # Perform Jarque-Bera test on wage equation residuals
-wage1 = woo.data('wage1')
+wage1 = wool.data('wage1')
 reg = smf.ols('np.log(wage) ~ educ + exper + tenure', data=wage1).fit()
 
 # Get residuals
@@ -908,7 +906,7 @@ The restricted model under $H_0$ is:
 $$\text{narr86} = \beta_0 + \beta_1 \cdot \text{pcnv} + \beta_4 \cdot \text{ptime86} + \beta_5 \cdot \text{qemp86} + u$$
 
 ```{code-cell} ipython3
-crime1 = woo.dataWoo("crime1")
+crime1 = wool.dataWoo("crime1")
 
 # 1. Estimate the restricted model under H0: beta_avgsen = 0 and beta_tottime = 0
 reg_r = smf.ols(formula="narr86 ~ pcnv + ptime86 + qemp86", data=crime1)

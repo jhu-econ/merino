@@ -6,12 +6,12 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.2
 kernelspec:
-  display_name: merino
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
-# Chapter 9: Specification and Data Issues
+# 9. More on Specification and Data Issues
 
 :::{important} Learning Objectives
 :class: dropdown
@@ -45,19 +45,15 @@ The organization follows a hierarchical development from foundational concepts t
 Throughout this chapter, we demonstrate theoretical results through simulation studies and illustrate practical applications using real econometric datasets. The chapter concludes with comprehensive guidance on diagnostic procedures and decision frameworks for applied research.
 
 ```{code-cell} ipython3
-# %pip install matplotlib numpy pandas statsmodels wooldridge scipy -q
-```
-
-```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
-import statsmodels.stats.outliers_influence as smo  # For RESET test and outlier diagnostics
+import statsmodels.stats.outliers_influence as smo
 import wooldridge as wool
 from IPython.display import display
-from scipy import stats  # For generating random numbers
+from scipy import stats
 ```
 
 ## 9.1 Functional Form Misspecification

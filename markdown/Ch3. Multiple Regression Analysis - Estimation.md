@@ -6,7 +6,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.2
 kernelspec:
-  display_name: merino
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -513,83 +513,6 @@ se  # Display standard errors
 
 The manually calculated coefficients (`b`), SER, and standard errors (`se`) should be very close (or identical, considering potential rounding differences) to the values reported in the `results.summary()` output from `statsmodels` for Example 3.1. This demonstrates that `statsmodels` is using the matrix-based OLS formulas under the hood.
 
-## 3.4 Ceteris Paribus Interpretation and Omitted Variable Bias
-
-A key advantage of multiple regression is its ability to provide **ceteris paribus** interpretations of the coefficients.  "Ceteris paribus" is Latin for "other things being equal" or "holding other factors constant." In the context of multiple regression, the coefficient on a particular independent variable represents the effect of that variable on the dependent variable *while holding all other included independent variables constant*.
-
-However, if we **omit** a relevant variable from our regression model, and this omitted variable is correlated with the included independent variables, we can encounter **omitted variable bias** (OVB). This means that the estimated coefficients on the included variables will be biased and inconsistent, and they will no longer have the desired ceteris paribus interpretation with respect to the omitted variable.
-
-**Why Omitted Variable Bias Violates MLR.4:**
-When we omit a relevant variable $x_k$, it becomes part of the error term: $u' = u + \beta_k x_k$. If the omitted $x_k$ is correlated with any included $x_j$, then $E(u'|x_1, \ldots, x_{k-1}) \neq 0$, violating the zero conditional mean assumption. This makes OLS biased and inconsistent.
-
-Let's revisit the college GPA example to illustrate omitted variable bias. Suppose the "true" model is:
-
-$$\text{colGPA} = \beta_0 + \beta_1 \text{hsGPA} + \beta_2 \text{ACT} + u$$
-
-But we mistakenly estimate a simple regression model, omitting `hsGPA`:
-
-$$\text{colGPA} = \gamma_0 + \gamma_1 \text{ACT} + v$$
-
-If `hsGPA` is correlated with `ACT` (which is likely - students with higher high school GPAs tend to score higher on standardized tests), then the estimated coefficient $\hat{\gamma}_1$ in the simple regression model will be biased. It will capture not only the direct effect of `ACT` on `colGPA` but also the indirect effect of `hsGPA` on `colGPA` that is correlated with `ACT`.
-
-Let's see this empirically. First, we estimate the "full" model (including both `hsGPA` and `ACT`):
-
-```{code-cell} ipython3
-gpa1 = wool.data("gpa1")
-
-# parameter estimates for full model:
-reg = smf.ols(
-    formula="colGPA ~ ACT + hsGPA",
-    data=gpa1,
-)  # Order of regressors doesn't matter in formula
-results = reg.fit()
-b = results.params  # Extract estimated coefficients
-b  # Display coefficients from full model
-```
-
-Now, let's consider the relationship between the included variable (`ACT`) and the omitted variable (`hsGPA`). We can regress the omitted variable (`hsGPA`) on the included variable (`ACT`):
-
-```{code-cell} ipython3
-# relation between regressors (hsGPA on ACT):
-reg_delta = smf.ols(formula="hsGPA ~ ACT", data=gpa1)
-results_delta = reg_delta.fit()
-delta_tilde = results_delta.params  # Extract coefficient of ACT in this regression
-delta_tilde  # Display coefficients from regression of hsGPA on ACT
-```
-
-$\delta_{\text{ACT}}$ from this regression represents how much `hsGPA` changes on average for a one-unit change in `ACT`.  It captures the correlation between `hsGPA` and `ACT`.
-
-The **omitted variable bias formula** provides an approximation for the bias in the simple regression coefficient $\hat{\gamma}_1$ when we omit `hsGPA`.  In this case, the bias in the coefficient of `ACT` (when `hsGPA` is omitted) is approximately:
-
-$$\text{Bias}(\hat{\gamma}_1) \approx \beta_1 \times \delta_{\text{ACT}}$$
-
-Where:
-
-* $\beta_1$ is the coefficient of the omitted variable (`hsGPA`) in the full model.
-* $\delta_{\text{ACT}}$ is the coefficient of the included variable (`ACT`) in the regression of the omitted variable (`hsGPA`) on the included variable (`ACT`).
-
-Let's calculate this approximate bias and see how it relates to the difference between the coefficient of `ACT` in the full model ($\beta_2$) and the coefficient of `ACT` in the simple model ($\gamma_1$).
-
-```{code-cell} ipython3
-# omitted variables formula for b1_tilde (approximate bias in ACT coefficient when hsGPA is omitted):
-b1_tilde = b["ACT"] + b["hsGPA"] * delta_tilde["ACT"]  # Applying the bias formula
-b1_tilde  # Display approximate biased coefficient of ACT
-```
-
-Finally, let's estimate the simple regression model (omitting `hsGPA`) and see the actual coefficient of `ACT`:
-
-```{code-cell} ipython3
-# actual regression with hsGPA omitted (simple regression):
-reg_om = smf.ols(formula="colGPA ~ ACT", data=gpa1)
-results_om = reg_om.fit()
-b_om = results_om.params  # Extract coefficient of ACT from simple regression
-b_om  # Display coefficient of ACT in simple regression
-```
-
-Comparing `b_om["ACT"]` (the coefficient of ACT in the simple regression) with `b["ACT"]` (the coefficient of ACT in the full regression), we can see that they are different.  Furthermore, `b1_tilde` (the approximate biased coefficient calculated using the formula) is close to `b_om["ACT"]`.
-
-**Conclusion on Omitted Variable Bias:** Omitting a relevant variable like `hsGPA` that is correlated with an included variable like `ACT` can lead to biased estimates. In this case, the coefficient on `ACT` in the simple regression is larger than in the multiple regression, likely because it is picking up some of the positive effect of `hsGPA` on `colGPA`.  This highlights the importance of including all relevant variables in a regression model to obtain unbiased and consistent estimates and to achieve correct ceteris paribus interpretations.
-
 ## 3.3 The Gauss-Markov Assumptions
 
 To establish the statistical properties of the OLS estimators in multiple regression, we need to specify the assumptions under which these properties hold. The **Gauss-Markov assumptions** provide the foundation for understanding when OLS produces the Best Linear Unbiased Estimators (BLUE). Let's examine each assumption:
@@ -673,6 +596,83 @@ The OLS estimator achieves minimum variance among linear unbiased estimators bec
 
 **Practical Implications:** These assumptions guide model specification, data collection, and interpretation of results. Violations can lead to biased, inconsistent, or inefficient estimates.
 :::
+
+## 3.4 Ceteris Paribus Interpretation and Omitted Variable Bias
+
+A key advantage of multiple regression is its ability to provide **ceteris paribus** interpretations of the coefficients.  "Ceteris paribus" is Latin for "other things being equal" or "holding other factors constant." In the context of multiple regression, the coefficient on a particular independent variable represents the effect of that variable on the dependent variable *while holding all other included independent variables constant*.
+
+However, if we **omit** a relevant variable from our regression model, and this omitted variable is correlated with the included independent variables, we can encounter **omitted variable bias** (OVB). This means that the estimated coefficients on the included variables will be biased and inconsistent, and they will no longer have the desired ceteris paribus interpretation with respect to the omitted variable.
+
+**Why Omitted Variable Bias Violates MLR.4:**
+When we omit a relevant variable $x_k$, it becomes part of the error term: $u' = u + \beta_k x_k$. If the omitted $x_k$ is correlated with any included $x_j$, then $E(u'|x_1, \ldots, x_{k-1}) \neq 0$, violating the zero conditional mean assumption. This makes OLS biased and inconsistent.
+
+Let's revisit the college GPA example to illustrate omitted variable bias. Suppose the "true" model is:
+
+$$\text{colGPA} = \beta_0 + \beta_1 \text{hsGPA} + \beta_2 \text{ACT} + u$$
+
+But we mistakenly estimate a simple regression model, omitting `hsGPA`:
+
+$$\text{colGPA} = \gamma_0 + \gamma_1 \text{ACT} + v$$
+
+If `hsGPA` is correlated with `ACT` (which is likely - students with higher high school GPAs tend to score higher on standardized tests), then the estimated coefficient $\hat{\gamma}_1$ in the simple regression model will be biased. It will capture not only the direct effect of `ACT` on `colGPA` but also the indirect effect of `hsGPA` on `colGPA` that is correlated with `ACT`.
+
+Let's see this empirically. First, we estimate the "full" model (including both `hsGPA` and `ACT`):
+
+```{code-cell} ipython3
+gpa1 = wool.data("gpa1")
+
+# parameter estimates for full model:
+reg = smf.ols(
+    formula="colGPA ~ ACT + hsGPA",
+    data=gpa1,
+)  # Order of regressors doesn't matter in formula
+results = reg.fit()
+b = results.params  # Extract estimated coefficients
+b  # Display coefficients from full model
+```
+
+Now, let's consider the relationship between the included variable (`ACT`) and the omitted variable (`hsGPA`). We can regress the omitted variable (`hsGPA`) on the included variable (`ACT`):
+
+```{code-cell} ipython3
+# relation between regressors (hsGPA on ACT):
+reg_delta = smf.ols(formula="hsGPA ~ ACT", data=gpa1)
+results_delta = reg_delta.fit()
+delta_tilde = results_delta.params  # Extract coefficient of ACT in this regression
+delta_tilde  # Display coefficients from regression of hsGPA on ACT
+```
+
+$\delta_{\text{ACT}}$ from this regression represents how much `hsGPA` changes on average for a one-unit change in `ACT`.  It captures the correlation between `hsGPA` and `ACT`.
+
+The **omitted variable bias formula** provides an approximation for the bias in the simple regression coefficient $\hat{\gamma}_1$ when we omit `hsGPA`.  In this case, the bias in the coefficient of `ACT` (when `hsGPA` is omitted) is approximately:
+
+$$\text{Bias}(\hat{\gamma}_1) \approx \beta_1 \times \delta_{\text{ACT}}$$
+
+Where:
+
+* $\beta_1$ is the coefficient of the omitted variable (`hsGPA`) in the full model.
+* $\delta_{\text{ACT}}$ is the coefficient of the included variable (`ACT`) in the regression of the omitted variable (`hsGPA`) on the included variable (`ACT`).
+
+Let's calculate this approximate bias and see how it relates to the difference between the coefficient of `ACT` in the full model ($\beta_2$) and the coefficient of `ACT` in the simple model ($\gamma_1$).
+
+```{code-cell} ipython3
+# omitted variables formula for b1_tilde (approximate bias in ACT coefficient when hsGPA is omitted):
+b1_tilde = b["ACT"] + b["hsGPA"] * delta_tilde["ACT"]  # Applying the bias formula
+b1_tilde  # Display approximate biased coefficient of ACT
+```
+
+Finally, let's estimate the simple regression model (omitting `hsGPA`) and see the actual coefficient of `ACT`:
+
+```{code-cell} ipython3
+# actual regression with hsGPA omitted (simple regression):
+reg_om = smf.ols(formula="colGPA ~ ACT", data=gpa1)
+results_om = reg_om.fit()
+b_om = results_om.params  # Extract coefficient of ACT from simple regression
+b_om  # Display coefficient of ACT in simple regression
+```
+
+Comparing `b_om["ACT"]` (the coefficient of ACT in the simple regression) with `b["ACT"]` (the coefficient of ACT in the full regression), we can see that they are different.  Furthermore, `b1_tilde` (the approximate biased coefficient calculated using the formula) is close to `b_om["ACT"]`.
+
+**Conclusion on Omitted Variable Bias:** Omitting a relevant variable like `hsGPA` that is correlated with an included variable like `ACT` can lead to biased estimates. In this case, the coefficient on `ACT` in the simple regression is larger than in the multiple regression, likely because it is picking up some of the positive effect of `hsGPA` on `colGPA`.  This highlights the importance of including all relevant variables in a regression model to obtain unbiased and consistent estimates and to achieve correct ceteris paribus interpretations.
 
 ## 3.5 Standard Errors, Multicollinearity, and VIF
 

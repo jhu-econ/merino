@@ -6,12 +6,12 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.2
 kernelspec:
-  display_name: merino
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
-# Chapter 4: Multiple Regression Analysis - Inference
+# 4. Multiple Regression Analysis: Inference
 
 :::{important} Learning Objectives
 :class: dropdown
