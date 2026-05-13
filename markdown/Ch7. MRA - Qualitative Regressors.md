@@ -47,6 +47,8 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import wooldridge as wool
 from scipy import stats
+
+plt.style.use("theme.mplstyle")
 ```
 
 ## 7.1 Linear Regression with Dummy Variables as Regressors
@@ -750,6 +752,7 @@ Looking at key coefficients:
 ### 7.6.3 Predicted Probabilities and Limitations
 
 ```{code-cell} ipython3
+:tags: [hide-input]
 # Calculate predicted probabilities
 mroz["pred_prob"] = results_lpm.fittedvalues
 

@@ -71,7 +71,8 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import wooldridge as wool
 from scipy import stats
-plt.rcParams['mathtext.fontset'] = 'dejavusans'
+
+plt.style.use("theme.mplstyle")
 ```
 
 ## 5.1 Consistency of OLS
@@ -275,7 +276,7 @@ In Chapter 4, we assumed **MLR.6: Normality** ($u \sim N(0, \sigma^2)$) for **ex
 $$t = \frac{\hat{\beta}_j}{\text{se}(\hat{\beta}_j)} \sim N(0, 1) \text{ approximately}$$
 
 **Confidence Intervals:**
-$$\hat{\beta}_j \pm 1.96 \cdot \text{se}(\hat{\beta}_j) \text{ (95% CI)}$$
+$$\hat{\beta}_j \pm 1.96 \cdot \text{se}(\hat{\beta}_j) \text{ (95\% CI)}$$
 
 **F-tests:**
 $$F \approx \chi^2_q / q \text{ where } q = \text{number of restrictions}$$
@@ -547,6 +548,10 @@ sim_info = pd.DataFrame(
     },
 )
 display(sim_info)
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Create visualization grid for results
 fig, axes = plt.subplots(2, 2, figsize=(12, 12))
@@ -653,6 +658,7 @@ In this simulation, we investigate what happens when one of the classical linear
 First, let's visualize the shape of the standardized Chi-squared distribution compared to the standard normal distribution.
 
 ```{code-cell} ipython3
+:tags: [hide-input]
 # support of normal density:
 x_range = np.linspace(-4, 4, num=100)
 
@@ -687,6 +693,7 @@ plt.show()
 The plot above shows that the standardized Chi-squared distribution is skewed to the right and has a different shape compared to the standard normal distribution. Now, let's perform the simulation with these non-normal errors.
 
 ```{code-cell} ipython3
+:tags: [hide-input]
 # set the random seed for reproducibility:
 np.random.seed(1234567)
 
@@ -775,6 +782,7 @@ This simulation demonstrates the power of the Central Limit Theorem in action. E
 In previous simulations (5.1.1 and 5.1.2), we fixed the regressors $x$ across replications for each sample size $n$. This is akin to *conditioning on the regressors*. In econometric theory, we often derive properties of OLS estimators *conditional* on the observed values of the regressors. However, in reality, regressors are also random variables. This simulation explores the implications of *not conditioning* on the regressors by drawing new samples of $x$ in each replication, along with new error terms. We will see if the asymptotic normality of $\hat{\beta}_1$ still holds when both $x$ and $u$ are randomly drawn in each simulation run.
 
 ```{code-cell} ipython3
+:tags: [hide-input]
 # set the random seed for reproducibility:
 np.random.seed(1234567)
 

@@ -46,6 +46,8 @@ import pandas as pd
 import statsmodels.formula.api as smf
 import wooldridge as wool
 from scipy import stats
+
+plt.style.use("theme.mplstyle")
 ```
 
 ## 6.1 Model Formulae
@@ -703,6 +705,7 @@ lpr_CI
 Finally, we plot the predicted log price and its confidence interval against the number of rooms.
 
 ```{code-cell} ipython3
+:tags: [hide-input]
 # plot:
 plt.plot(
     X["rooms"],
@@ -1079,6 +1082,10 @@ house_model = smf.ols('price ~ lotsize + sqrft + bdrms', data=hprice1).fit()
 residuals = house_model.resid
 fitted = house_model.fittedvalues
 standardized_resid = house_model.resid_pearson
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Create 2x2 subplot for diagnostics
 fig, axes = plt.subplots(2, 2, figsize=(12, 10))
@@ -1139,6 +1146,7 @@ Some observations have disproportionate influence on regression results. Key dia
 **Example: Influence Diagnostics**
 
 ```{code-cell} ipython3
+:tags: [hide-input]
 # Calculate influence measures
 from statsmodels.stats.outliers_influence import OLSInfluence
 

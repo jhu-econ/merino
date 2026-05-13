@@ -54,6 +54,8 @@ import statsmodels.stats.outliers_influence as smo
 import wooldridge as wool
 from IPython.display import display
 from scipy import stats
+
+plt.style.use("theme.mplstyle")
 ```
 
 ## 9.1 Functional Form Misspecification
@@ -733,6 +735,10 @@ Visualizing the distribution of studentized residuals can also be helpful.
 # Fit kernel density estimator
 kde = sm.nonparametric.KDEUnivariate(studres)
 kde.fit()  # Estimate the density
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Create the plot
 plt.figure(figsize=(8, 5))

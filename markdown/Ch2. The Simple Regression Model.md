@@ -46,17 +46,12 @@ Throughout this chapter, we implement concepts using Python's scientific computi
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import statsmodels.formula.api as smf
 import wooldridge as wool
 from IPython.display import display
 from scipy import stats
-sns.set_style("whitegrid")  # Clean seaborn style with grid
-sns.set_palette("husl")  # Attractive color palette
-plt.rcParams["figure.figsize"] = [10, 6]  # Default figure size
-plt.rcParams["font.size"] = 11  # Slightly larger font size
-plt.rcParams["axes.titlesize"] = 14  # Larger title font
-plt.rcParams["axes.labelsize"] = 12  # Larger axis label font
+
+plt.style.use("theme.mplstyle")
 ```
 
 ## 2.1 Simple OLS Regression
@@ -193,6 +188,7 @@ This code snippet uses `statsmodels.formula.api` to define and fit the same regr
 To better visualize the regression results and the relationship between CEO salary and ROE, let's create an enhanced regression plot. We'll define a reusable function for this purpose, which includes the regression line, scatter plot of the data, confidence intervals, and annotations for the regression equation and R-squared.
 
 ```{code-cell} ipython3
+:tags: [hide-input]
 def plot_regression(
     x: str,
     y: str,
@@ -227,16 +223,30 @@ def plot_regression(
     # Create figure with professional styling
     fig, ax = plt.subplots(figsize=(12, 8))
 
-    # Plot data points and regression line with confidence band
-    sns.regplot(
-        data=data,
-        x=x,
-        y=y,
-        ci=95 if add_ci else None,  # 95% confidence interval for mean prediction
-        ax=ax,
-        scatter_kws={"alpha": 0.6, "edgecolor": "white", "linewidths": 0.5},
-        line_kws={"linewidth": 2},
-    )
+    # Scatter of raw data
+    x_vals = data[x].to_numpy()
+    y_vals = data[y].to_numpy()
+    ax.scatter(x_vals, y_vals, alpha=0.6, edgecolor="white", linewidths=0.5)
+
+    # OLS fit line over the observed support
+    x_grid = np.linspace(x_vals.min(), x_vals.max(), 200)
+    intercept_val = results.params.iloc[0]
+    slope_val = results.params.iloc[1]
+    y_hat = intercept_val + slope_val * x_grid
+    ax.plot(x_grid, y_hat, linewidth=2, color="C0")
+
+    # 95% CI band for the mean response using the fitted residual variance
+    if add_ci:
+        n_obs_ci = int(results.nobs)
+        x_mean = x_vals.mean()
+        ssx = ((x_vals - x_mean) ** 2).sum()
+        sigma_hat = np.sqrt(results.mse_resid)
+        se_mean = sigma_hat * np.sqrt(1 / n_obs_ci + (x_grid - x_mean) ** 2 / ssx)
+        t_crit = stats.t.ppf(0.975, df=results.df_resid)
+        ax.fill_between(
+            x_grid, y_hat - t_crit * se_mean, y_hat + t_crit * se_mean,
+            color="C0", alpha=0.2,
+        )
 
     # Construct regression equation and statistics text
     intercept = results.params.iloc[0]
@@ -463,11 +473,11 @@ By examining the table, you can see for each company the actual CEO salary, the 
 :::
 
 ```{code-cell} ipython3
-# Create residual plot with seaborn defaults
+:tags: [hide-input]
+# Create residual plot
 fig, ax = plt.subplots(figsize=(10, 6))
 
-# Simple, clean scatter plot
-sns.scatterplot(x=salary_hat, y=u_hat, ax=ax)
+ax.scatter(salary_hat, u_hat, alpha=0.7)
 
 # Add reference line
 ax.axhline(y=0, linestyle="--", label="Zero Line")
@@ -639,11 +649,12 @@ The R-squared value calculated (around 0.013 in our example) will be the same re
 :::
 
 ```{code-cell} ipython3
-# Create model fit visualization with seaborn defaults
+:tags: [hide-input]
+# Create model fit visualization
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 # Actual vs Predicted plot
-sns.scatterplot(x=sal, y=sal_hat, ax=axes[0])
+axes[0].scatter(sal, sal_hat, alpha=0.7)
 axes[0].plot([sal.min(), sal.max()], [sal.min(), sal.max()], "--", label="Perfect Fit")
 axes[0].set_title("Actual vs Predicted Salary")
 axes[0].set_xlabel("Actual Salary")
@@ -651,7 +662,7 @@ axes[0].set_ylabel("Predicted Salary")
 axes[0].legend()
 
 # Residuals vs Fitted plot
-sns.scatterplot(x=sal_hat, y=u_hat, ax=axes[1])
+axes[1].scatter(sal_hat, u_hat, alpha=0.7)
 axes[1].axhline(y=0, linestyle="--", label="Zero Line")
 axes[1].set_title("Residuals vs Fitted Values")
 axes[1].set_xlabel("Fitted Values")
@@ -714,6 +725,10 @@ summary_metrics = pd.DataFrame(
 display(summary_metrics[["Metric", "Formatted"]])
 
 summary_stats.round(4)  # Display summary statistics table, rounded to 4 decimal places
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Create enhanced visualization - Regression plot with confidence interval
 plt.figure(figsize=(10, 6))
@@ -805,18 +820,17 @@ We find $\hat{\beta}_1 = 0.0827$. In the log-level model, this coefficient can b
 :::
 
 ```{code-cell} ipython3
-# Create log-level visualization with seaborn defaults
+:tags: [hide-input]
+# Create log-level visualization
 fig, ax = plt.subplots(figsize=(10, 6))
 
-# Simple, elegant regression plot
-sns.regplot(
-    data=wage1,
-    x="educ",
-    y=np.log(wage1["wage"]),
-    ax=ax,
-)
+x_vals = wage1["educ"].to_numpy()
+y_vals = np.log(wage1["wage"]).to_numpy()
+ax.scatter(x_vals, y_vals, alpha=0.6)
+slope, intercept = np.polyfit(x_vals, y_vals, 1)
+x_grid = np.linspace(x_vals.min(), x_vals.max(), 100)
+ax.plot(x_grid, intercept + slope * x_grid, linewidth=2, color="C1")
 
-# Clean titles and labels
 ax.set_title("Log-Level Model: Log(Wage) vs Years of Education")
 ax.set_xlabel("Years of Education")
 ax.set_ylabel("Log(Hourly Wage)")
@@ -873,18 +887,17 @@ We find $\hat{\beta}_1 = 0.2567$. In the log-log model, this coefficient is the 
 :::
 
 ```{code-cell} ipython3
-# Create log-log visualization with seaborn defaults
+:tags: [hide-input]
+# Create log-log visualization
 fig, ax = plt.subplots(figsize=(10, 6))
 
-# Simple, elegant regression plot
-sns.regplot(
-    data=ceosal1,
-    x=np.log(ceosal1["sales"]),
-    y=np.log(ceosal1["salary"]),
-    ax=ax,
-)
+x_vals = np.log(ceosal1["sales"]).to_numpy()
+y_vals = np.log(ceosal1["salary"]).to_numpy()
+ax.scatter(x_vals, y_vals, alpha=0.6)
+slope, intercept = np.polyfit(x_vals, y_vals, 1)
+x_grid = np.linspace(x_vals.min(), x_vals.max(), 100)
+ax.plot(x_grid, intercept + slope * x_grid, linewidth=2, color="C1")
 
-# Clean titles and labels
 ax.set_title("Log-Log Model: CEO Salary Elasticity")
 ax.set_xlabel("Log(Firm Sales)")
 ax.set_ylabel("Log(CEO Salary)")
@@ -955,21 +968,23 @@ comparison_data = pd.DataFrame(
     },
 )
 comparison_data
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Create regression comparison visualization
 fig, ax = plt.subplots(figsize=(12, 8))
 
-# Enhanced scatter plot with seaborn
-sns.scatterplot(
-    data=ceosal1,
-    x="roe",
-    y="salary",
+# Scatter of raw data
+ax.scatter(
+    ceosal1["roe"],
+    ceosal1["salary"],
     alpha=0.7,
     s=80,
     edgecolors="white",
     linewidths=0.5,
     label="Data Points",
-    ax=ax,
 )
 
 # Generate smooth x range for regression lines
@@ -1138,6 +1153,10 @@ manual_calculations = pd.DataFrame(
 display(manual_calculations[["Statistic", "Formatted"]])
 
 results.summary().tables[1]  # Display statsmodels summary table
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Create visualization with confidence intervals - Regression plot with CI
 plt.figure(figsize=(10, 6))
@@ -1172,6 +1191,7 @@ For example, in our wage-education regression:
 - These omitted factors affect both education and wages
 
 ```{code-cell} ipython3
+:tags: [hide-input]
 # Illustrate the omitted variable problem
 np.random.seed(42)
 n = 1000
@@ -1363,6 +1383,10 @@ ate_results = pd.DataFrame(
 )
 
 display(ate_results.round(3))
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Visualize the RCT results: Box plot comparing treatment and control
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -1465,12 +1489,16 @@ parameter_comparison = pd.DataFrame(
     },
 )
 parameter_comparison[["Parameter", "Comparison"]]
+```
 
-# Create Monte Carlo visualization with seaborn defaults
+```{code-cell} ipython3
+:tags: [hide-input]
+
+# Create Monte Carlo visualization
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 # Data and regression lines plot
-sns.scatterplot(x=x, y=y, ax=axes[0])
+axes[0].scatter(x, y, alpha=0.6)
 x_range = np.linspace(x.min(), x.max(), 100)
 axes[0].plot(x_range, beta0 + beta1 * x_range, label="True Population Line")
 axes[0].plot(
@@ -1485,7 +1513,7 @@ axes[0].set_ylabel("y")
 axes[0].legend()
 
 # Error distribution plot
-sns.histplot(u, bins=25, stat="density", ax=axes[1])
+axes[1].hist(u, bins=25, density=True, alpha=0.7, edgecolor="white")
 u_range = np.linspace(u.min(), u.max(), 100)
 axes[1].plot(u_range, stats.norm.pdf(u_range, 0, sigma_u), label="True Distribution")
 axes[1].set_title("Error Term Distribution")
@@ -1548,12 +1576,16 @@ monte_carlo_results = pd.DataFrame(
     },
 )
 monte_carlo_results[["Parameter", "Summary"]]
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Create sampling distribution visualization with seaborn defaults
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 # Beta_0 distribution
-sns.histplot(b0, bins=25, stat="density", ax=axes[0])
+axes[0].hist(b0, bins=25, density=True, alpha=0.7, edgecolor="white")
 axes[0].axvline(beta0, linestyle="-", label="True Value")
 axes[0].axvline(np.mean(b0), linestyle="--", label="Sample Mean")
 axes[0].set_title("Sampling Distribution of $\\beta_0$")
@@ -1561,7 +1593,7 @@ axes[0].set_xlabel("$\\beta_0$ Estimates")
 axes[0].legend()
 
 # Beta_1 distribution
-sns.histplot(b1, bins=25, stat="density", ax=axes[1])
+axes[1].hist(b1, bins=25, density=True, alpha=0.7, edgecolor="white")
 axes[1].axvline(beta1, linestyle="-", label="True Value")
 axes[1].axvline(np.mean(b1), linestyle="--", label="Sample Mean")
 axes[1].set_title("Sampling Distribution of $\\beta_1$")
@@ -1625,12 +1657,16 @@ bias_results = pd.DataFrame(
     },
 )
 bias_results[["Parameter", "Analysis"]]
+```
 
-# Create bias visualization with seaborn defaults
+```{code-cell} ipython3
+:tags: [hide-input]
+
+# Create bias visualization
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 # Beta_0 distribution showing bias
-sns.histplot(b0, bins=25, stat="density", ax=axes[0])
+axes[0].hist(b0, bins=25, density=True, alpha=0.7, edgecolor="white")
 axes[0].axvline(beta0, linestyle="-", label="True Value")
 axes[0].axvline(np.mean(b0), linestyle="--", label="Biased Mean")
 axes[0].set_title("Sampling Distribution of $\\beta_0$\nwith E(u|x) $\\neq$ 0")
@@ -1638,7 +1674,7 @@ axes[0].set_xlabel("$\\beta_0$ Estimates")
 axes[0].legend()
 
 # Beta_1 distribution showing bias
-sns.histplot(b1, bins=25, stat="density", ax=axes[1])
+axes[1].hist(b1, bins=25, density=True, alpha=0.7, edgecolor="white")
 axes[1].axvline(beta1, linestyle="-", label="True Value")
 axes[1].axvline(np.mean(b1), linestyle="--", label="Biased Mean")
 axes[1].set_title("Sampling Distribution of $\\beta_1$\nwith E(u|x) $\\neq$ 0")
@@ -1701,6 +1737,10 @@ heteroscedasticity_results = pd.DataFrame(
     },
 )
 heteroscedasticity_results[["Parameter", "Summary"]]
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
 
 # Create heteroscedasticity visualization - Use last replication for visualization
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
@@ -1709,7 +1749,7 @@ fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 y_last = y[-1]  # Last replication for visualization
 u_last = u[-1]  # Last replication errors
 
-sns.scatterplot(x=x, y=y_last, ax=axes[0])
+axes[0].scatter(x, y_last, alpha=0.6)
 x_range = np.linspace(x.min(), x.max(), 100)
 axes[0].plot(x_range, beta0 + beta1 * x_range, "--", label="True Regression Line")
 axes[0].set_title("Sample Data with Heteroscedasticity")
@@ -1718,7 +1758,7 @@ axes[0].set_ylabel("y")
 axes[0].legend()
 
 # Error term visualization
-sns.scatterplot(x=x, y=u_last, ax=axes[1])
+axes[1].scatter(x, u_last, alpha=0.6)
 axes[1].axhline(y=0, linestyle="--", label="E(u|x) = 0")
 axes[1].set_title("Error Terms vs. x")
 axes[1].set_xlabel("x")
