@@ -730,18 +730,18 @@ m3 = smf.ols("colGPA ~ hsGPA + ACT + skipped", data=gpa1).fit()
 comparison_table = pd.DataFrame(
     {
         "Variable": ["Intercept", "hsGPA", "ACT", "skipped"],
-        "Model 1": [f"{m1.params[0]:.3f}", f"{m1.params[1]:.3f}***", "-", "-"],
+        "Model 1": [f"{m1.params.iloc[0]:.3f}", f"{m1.params.iloc[1]:.3f}***", "-", "-"],
         "Model 2": [
-            f"{m2.params[0]:.3f}",
-            f"{m2.params[1]:.3f}***",
-            f"{m2.params[2]:.3f}",
+            f"{m2.params.iloc[0]:.3f}",
+            f"{m2.params.iloc[1]:.3f}***",
+            f"{m2.params.iloc[2]:.3f}",
             "-",
         ],
         "Model 3": [
-            f"{m3.params[0]:.3f}",
-            f"{m3.params[1]:.3f}***",
-            f"{m3.params[2]:.3f}",
-            f"{m3.params[3]:.3f}***",
+            f"{m3.params.iloc[0]:.3f}",
+            f"{m3.params.iloc[1]:.3f}***",
+            f"{m3.params.iloc[2]:.3f}",
+            f"{m3.params.iloc[3]:.3f}***",
         ],
     },
 )

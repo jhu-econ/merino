@@ -491,7 +491,7 @@ The denominator $(n-k-1)$ represents the degrees of freedom in multiple regressi
 u_hat = (
     y.values.reshape(-1, 1) - X.values @ beta_estimates
 )  # Calculate residuals as numpy array
-sigsq_hat = float((u_hat.T @ u_hat) / (n - k - 1))  # Estimated error variance (scalar)
+sigsq_hat = ((u_hat.T @ u_hat) / (n - k - 1)).item()  # Estimated error variance (scalar)
 SER = np.sqrt(sigsq_hat)  # Standard Error of Regression
 SER  # Display SER
 ```
