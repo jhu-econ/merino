@@ -906,7 +906,7 @@ The restricted model under $H_0$ is:
 $$\text{narr86} = \beta_0 + \beta_1 \cdot \text{pcnv} + \beta_4 \cdot \text{ptime86} + \beta_5 \cdot \text{qemp86} + u$$
 
 ```{code-cell} ipython3
-crime1 = wool.dataWoo("crime1")
+crime1 = wool.data("crime1")
 
 # 1. Estimate the restricted model under H0: beta_avgsen = 0 and beta_tottime = 0
 reg_r = smf.ols(formula="narr86 ~ pcnv + ptime86 + qemp86", data=crime1)
