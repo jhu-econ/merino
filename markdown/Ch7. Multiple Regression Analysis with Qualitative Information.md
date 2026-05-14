@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# 7. Multiple Regression Analysis with Qualitative Regressors
+# 7. Multiple Regression Analysis with Qualitative Information
 
 :::{important} Learning Objectives
 :class: dropdown

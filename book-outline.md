@@ -296,13 +296,13 @@ Summary | Key Terms | Sample Empirical Projects | List of Journals | Data Source
 
 ### ✅ Built Chapters (MyST Markdown)
 - Chapter 2: The Simple Regression Model
-- Chapter 3: Multiple Regression Analysis - Estimation
-- Chapter 4: Multiple Regression Analysis - Inference
-- Chapter 5: MRA - OLS Asymptotics
-- Chapter 6: MRA - Further Issues
-- Chapter 7: MRA - Qualitative Regressors
+- Chapter 3: Multiple Regression Analysis: Estimation
+- Chapter 4: Multiple Regression Analysis: Inference
+- Chapter 5: Multiple Regression Analysis: OLS Asymptotics
+- Chapter 6: Multiple Regression Analysis: Further Issues
+- Chapter 7: Multiple Regression Analysis with Qualitative Information
 - Chapter 8: Heteroskedasticity
-- Chapter 9: Specification and Data Issues
+- Chapter 9: More on Specification and Data Issues
 - Chapter 10: Basic Regression Analysis with Time Series Data
 - Chapter 11: Further Issues in Using OLS with Time Series Data
 - Chapter 12: Serial Correlation and Heteroskedasticity in Time Series Regressions

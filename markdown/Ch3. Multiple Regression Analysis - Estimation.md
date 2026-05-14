@@ -555,7 +555,7 @@ This assumption ensures that the variance of the error term is constant across a
 Under assumptions **MLR.1 through MLR.4** (linearity, random sampling, no perfect collinearity, and zero conditional mean), the OLS estimators are unbiased:
 $$E(\hat{\beta}_j) = \beta_j \text{ for } j = 0, 1, 2, \ldots, k$$
 
-This means that on average, across repeated random samples from the same population, the OLS estimates equal the true population parameters. Crucially, **homoscedasticity (MLR.5) is not required** for unbiasedness--only the first four assumptions are needed.
+This means that on average, across repeated random samples from the same population, the OLS estimates equal the true population parameters. Crucially, **homoscedasticity (MLR.5) is not required** for unbiasedness; only the first four assumptions are needed.
 
 **Theorem 3.2: Variance of OLS Estimators (MLR.1-MLR.5)**
 Under assumptions **MLR.1 through MLR.5** (including homoscedasticity), the variance-covariance matrix of the OLS estimators $\hat{\boldsymbol{\beta}} = (\hat{\beta}_0, \hat{\beta}_1, \ldots, \hat{\beta}_k)'$ conditional on the sample values of $\mathbf{X}$ is:
@@ -596,6 +596,45 @@ The OLS estimator achieves minimum variance among linear unbiased estimators bec
 
 **Practical Implications:** These assumptions guide model specification, data collection, and interpretation of results. Violations can lead to biased, inconsistent, or inefficient estimates.
 :::
+
+### Empirical Diagnostics for the GM Assumptions
+
+The first three assumptions (linearity, random sampling, no perfect collinearity) are largely design choices: linearity is what we specify, random sampling is a property of how the data were collected, and perfect collinearity is checked automatically by `statsmodels` (it drops or refuses to estimate redundant regressors). The harder assumptions to assess in practice are **MLR.3 in its weaker form** (severe multicollinearity), **MLR.4** (zero conditional mean), and **MLR.5** (homoskedasticity). The cell below runs three standard diagnostics on a wage regression.
+
+```{code-cell} ipython3
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.stats.diagnostic import het_breuschpagan
+
+wage1 = wool.data("wage1")
+reg = smf.ols("np.log(wage) ~ educ + exper + tenure", data=wage1).fit()
+
+# MLR.3 (weak form): variance inflation factors for the slope coefficients.
+# (The intercept always has a high VIF and is uninformative, so we skip column 0.)
+X_design = reg.model.exog
+vif_df = pd.DataFrame(
+    {
+        "regressor": reg.model.exog_names[1:],
+        "VIF": [variance_inflation_factor(X_design, j) for j in range(1, X_design.shape[1])],
+    },
+)
+
+# MLR.4: residual mean within bins of each regressor (should hover near zero)
+resid = reg.resid
+binned = pd.DataFrame({"educ": wage1["educ"], "resid": resid})
+mlr4 = binned.groupby(pd.qcut(binned["educ"], 4, duplicates="drop"), observed=True)["resid"].mean().round(4)
+
+# MLR.5: Breusch-Pagan test for heteroskedasticity
+bp_lm, bp_p, _, _ = het_breuschpagan(resid, X_design)
+
+print("MLR.3: Variance Inflation Factors (>10 signals trouble)")
+display(vif_df.round(2))
+print("\nMLR.4: Mean residual within educ quartiles (should be ~0)")
+print(mlr4.to_string())
+print(f"\nMLR.5: Breusch-Pagan LM = {bp_lm:.2f}, p-value = {bp_p:.4f}")
+print("       (small p-value rejects homoskedasticity)")
+```
+
+VIFs near 1 indicate the regressors carry independent information, so MLR.3 holds in its useful form. Residual means within `educ` quartiles close to zero are consistent with MLR.4 (no obvious nonlinearity in `educ`), and the Breusch-Pagan test addresses MLR.5 directly: rejection signals heteroskedasticity, in which case OLS remains unbiased but its conventional standard errors are wrong, motivating the heteroskedasticity-robust inference of Chapter 8.
 
 ## 3.4 Ceteris Paribus Interpretation and Omitted Variable Bias
 

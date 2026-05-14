@@ -40,11 +40,16 @@ Statistical inference extends multiple regression analysis beyond point estimati
 The organization proceeds systematically through the essential components of inference. We begin with the sampling distribution of OLS estimators and construction of standard errors (Section 4.1), develop hypothesis testing procedures for single coefficients (Section 4.2), extend to joint hypothesis tests involving multiple restrictions (Section 4.3), and examine confidence intervals alongside practical considerations for specification and reporting (Section 4.4-4.7). Throughout, we emphasize both theoretical foundations and computational implementation in Python.
 
 ```{code-cell} ipython3
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import wooldridge as wool
+from IPython.display import display
 from scipy import stats
+
+plt.style.use("theme.mplstyle")
 ```
 
 ## 4.1 Assumptions for Statistical Inference
@@ -68,7 +73,7 @@ For asymptotically valid inference in large samples, we need only the Gauss-Mark
 - The t-statistics approximately follow the t-distribution (or standard normal for large $n$)
 - The F-statistics approximately follow the F-distribution
 
-**Practical Implication:** With moderate to large sample sizes (typically $n \geq 30$ or more), the t-tests and F-tests are robust to violations of normality, making them widely applicable even when errors are not normally distributed. Throughout this chapter, we assume sufficient conditions for valid inference--either MLR.1-MLR.6 for exact results or MLR.1-MLR.5 with large $n$ for asymptotic results.
+**Practical Implication:** With moderate to large sample sizes (typically $n \geq 30$ or more), the t-tests and F-tests are robust to violations of normality, making them widely applicable even when errors are not normally distributed. Throughout this chapter, we assume sufficient conditions for valid inference, either MLR.1-MLR.6 for exact results or MLR.1-MLR.5 with large $n$ for asymptotic results.
 
 **Summary Table: Assumptions Required for Different Properties**
 
@@ -80,6 +85,43 @@ For asymptotically valid inference in large samples, we need only the Gauss-Mark
 | **Exact t/F tests** | MLR.1-MLR.6 | Normality (MLR.6) for finite samples |
 | **Asymptotic t/F tests** | MLR.1-MLR.5 | CLT applies as $n \to \infty$ |
 | **Valid OLS standard errors** | MLR.1-MLR.5 | Homoscedasticity needed; otherwise use robust SE |
+
+### Checking MLR.6 on a Real Dataset
+
+For finite-sample t and F distributions to hold exactly, the errors must be conditionally normal (MLR.6). In moderate-to-large samples the CLT rescues us, but it is still informative to inspect the residual distribution. The cell below fits a wage equation, then runs the Jarque-Bera test on the residuals and plots a normal Q-Q plot.
+
+```{code-cell} ipython3
+from statsmodels.stats.stattools import jarque_bera
+
+wage1 = wool.data("wage1")
+
+# Two specifications: levels vs log; log usually gives more symmetric residuals.
+levels = smf.ols("wage ~ educ + exper + tenure", data=wage1).fit()
+logs = smf.ols("np.log(wage) ~ educ + exper + tenure", data=wage1).fit()
+
+jb_table = pd.DataFrame(
+    {
+        "Model": ["wage (levels)", "log(wage)"],
+        "JB statistic": [jarque_bera(levels.resid)[0], jarque_bera(logs.resid)[0]],
+        "p-value": [jarque_bera(levels.resid)[1], jarque_bera(logs.resid)[1]],
+        "Skewness": [jarque_bera(levels.resid)[2], jarque_bera(logs.resid)[2]],
+        "Kurtosis": [jarque_bera(levels.resid)[3], jarque_bera(logs.resid)[3]],
+    },
+)
+display(jb_table.round(3))
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+for ax, results, title in zip(axes, (levels, logs), ("wage", "log(wage)")):
+    sm.qqplot(results.resid, line="45", fit=True, ax=ax)
+    ax.set_title(f"Q-Q plot of residuals: {title} model")
+plt.tight_layout()
+```
+
+The level-form residuals are sharply right-skewed (wages cannot be negative and have a long upper tail), so Jarque-Bera decisively rejects normality and the Q-Q plot bows away from the 45-degree line. The log-form residuals are much closer to normal but still imperfect. The practical lesson is the one Wooldridge emphasizes: MLR.6 is rarely satisfied even for sensible models, but with $n = 526$ here the CLT carries the t-tests anyway, which is why Chapter 5's asymptotic results are the workhorse in applied work.
 
 ## 4.2 The $t$ Test
 

@@ -16,17 +16,17 @@ project:
     - file: markdown/Ch2. The Simple Regression Model.md
     - file: markdown/Ch3. Multiple Regression Analysis - Estimation.md
     - file: markdown/Ch4. Multiple Regression Analysis - Inference.md
-    - file: markdown/Ch5. MRA - OLS Asymptotics.md
-    - file: markdown/Ch6. MRA - Further Issues.md
-    - file: markdown/Ch7. MRA - Qualitative Regressors.md
+    - file: markdown/Ch5. Multiple Regression Analysis - OLS Asymptotics.md
+    - file: markdown/Ch6. Multiple Regression Analysis - Further Issues.md
+    - file: markdown/Ch7. Multiple Regression Analysis with Qualitative Information.md
     - file: markdown/Ch8. Heteroskedasticity.md
-    - file: markdown/Ch9. Specification and Data Issues.md
+    - file: markdown/Ch9. More on Specification and Data Issues.md
     - file: markdown/Ch10. Basic Regression Analysis with Time Series Data.md
     - file: markdown/Ch11. Further Issues in Using OLS with Time Series Data.md
     - file: markdown/Ch12. Serial Correlation and Heteroskedasticity in Time Series Regressions.md
     - file: markdown/Ch13. Pooling Cross Sections across Time - Simple Panel Data Methods.md
     - file: markdown/Ch14. Advanced Panel Data Methods.md
-    - file: markdown/Ch15. Instrumental Variables Estimation and Two Stage Least Squares.md
+    - file: markdown/Ch15. Instrumental Variables Estimation and Two-Stage Least Squares.md
     - file: markdown/Ch16. Simultaneous Equations Models.md
     - file: markdown/Ch17. Limited Dependent Variable Models and Sample Selection Corrections.md
     - file: markdown/Ch18. Advanced Time Series Topics.md

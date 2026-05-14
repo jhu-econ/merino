@@ -1437,7 +1437,7 @@ Decision Tree:
 
 ### 9.5 Connections to Other Chapters
 
-**To Chapter 6 (Further Issues in MRA):**
+**To Chapter 6 (Multiple Regression Analysis: Further Issues):**
 - Builds on functional form discussion (logs, interactions from Ch6)
 - Extends scaling and measurement concerns
 - Connects proxy variables to omitted variable bias (Ch6.3)

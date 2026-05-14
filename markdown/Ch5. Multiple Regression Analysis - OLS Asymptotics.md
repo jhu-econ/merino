@@ -41,7 +41,7 @@ Under the Gauss-Markov assumptions **MLR.1-MLR.4** (from Chapter 3: linearity, r
 
 **1. Consistency:** $\hat{\beta}_j \xrightarrow{p} \beta_j$ as $n \to \infty$ for all $j = 0, 1, \ldots, k$
 
-The OLS estimators converge in probability to the true parameter values as the sample size grows large. Consistency is a weaker property than unbiasedness--it only requires that the estimator approaches the true value asymptotically. Notably, consistency does **not** require normality (MLR.6) or homoscedasticity (MLR.5).
+The OLS estimators converge in probability to the true parameter values as the sample size grows large. Consistency is a weaker property than unbiasedness; it only requires that the estimator approaches the true value asymptotically. Notably, consistency does **not** require normality (MLR.6) or homoscedasticity (MLR.5).
 
 **2. Asymptotic Normality:** $\sqrt{n}(\hat{\beta}_j - \beta_j) \xrightarrow{d} N(0, \sigma^2_{\beta_j})$ as $n \to \infty$
 
@@ -305,6 +305,66 @@ $$F \approx \chi^2_q / q \text{ where } q = \text{number of restrictions}$$
 
 **Practical Recommendation**: Use asymptotic inference with **robust standard errors** (Chapter 8) for most applications.
 :::
+
+### 5.2.4 Monte Carlo Demonstration with Non-Normal Errors
+
+The CLT says the OLS slope is approximately normal in large samples even when the errors themselves are not. We simulate from a model with a sharply skewed chi-squared error, then plot the studentized slope $(\hat{\beta}_1 - \beta_1)/\widehat{\text{se}}(\hat{\beta}_1)$ for sample sizes $n = 10, 50, 200, 1000$ and overlay the standard normal density. As $n$ grows, the empirical histogram lines up with $N(0,1)$, which is the operational meaning of asymptotic normality.
+
+```{code-cell} ipython3
+rng = np.random.default_rng(seed=42)
+beta0, beta1 = 1.0, 2.0
+sample_sizes = [10, 50, 200, 1000]
+reps = 4000
+
+t_dist = {}
+for n in sample_sizes:
+    x = rng.uniform(0, 4, size=n)
+    studentized = np.empty(reps)
+    for r in range(reps):
+        # Skewed errors: centered chi-squared(2) so E[u]=0 but distribution is far from normal.
+        u = rng.chisquare(df=2, size=n) - 2.0
+        y = beta0 + beta1 * x + u
+        # OLS slope and its SE via closed form
+        x_centered = x - x.mean()
+        beta1_hat = (x_centered @ (y - y.mean())) / (x_centered @ x_centered)
+        beta0_hat = y.mean() - beta1_hat * x.mean()
+        resid = y - (beta0_hat + beta1_hat * x)
+        sigma2 = (resid @ resid) / (n - 2)
+        se_b1 = np.sqrt(sigma2 / (x_centered @ x_centered))
+        studentized[r] = (beta1_hat - beta1) / se_b1
+    t_dist[n] = studentized
+
+# Compare empirical mean and standard deviation to N(0,1)
+summary = pd.DataFrame(
+    {
+        "n": sample_sizes,
+        "empirical mean": [t_dist[n].mean() for n in sample_sizes],
+        "empirical sd": [t_dist[n].std(ddof=1) for n in sample_sizes],
+        "P(|t|>1.96)": [(np.abs(t_dist[n]) > 1.96).mean() for n in sample_sizes],
+    },
+)
+display(summary.round(3))
+```
+
+```{code-cell} ipython3
+:tags: [hide-input]
+
+plt.style.use("theme.mplstyle")
+grid = np.linspace(-4, 4, 300)
+normal_pdf = (1 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * grid**2)
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 3.4), sharey=True)
+for ax, n in zip(axes, sample_sizes):
+    ax.hist(t_dist[n], bins=40, density=True, alpha=0.7, edgecolor="white")
+    ax.plot(grid, normal_pdf, color="C3", linewidth=2, label="N(0,1)")
+    ax.set_title(f"n = {n}")
+    ax.set_xlim(-4, 4)
+    ax.legend(loc="upper right", fontsize=9)
+axes[0].set_ylabel("Density")
+plt.tight_layout()
+```
+
+At $n = 10$ the studentized slope has noticeably heavier tails than $N(0,1)$ (empirical sd above one) and the rejection rate $P(|t| > 1.96)$ overshoots the nominal 5%; this is the small-sample distortion that MLR.6 plus exact t-distribution inference would prevent. By $n = 200$ the empirical standard deviation is already very close to 1 and the rejection rate near 5%, confirming that t-based inference is asymptotically valid without invoking MLR.6.
 
 ## 5.3 Asymptotic Efficiency of OLS
 
